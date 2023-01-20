@@ -27,6 +27,18 @@
   box-shadow: 0px 20px 10px -3px rgba(213, 213, 213, 0.4), inset 10px 10px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px !important;
   z-index: 1;
+  overflow: hidden;
+}
+
+@media only screen and (max-width: 768px) {
+  .widget {
+    box-shadow: none;
+    background: transparent;
+  }
+  /* For mobile phones: */
+  .widget::after {
+    display: none;
+  }
 }
 
 .widget::after {
@@ -47,8 +59,7 @@
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-  height: 560px;
-  margin-bottom: 60px;
+  height: 100%;
 }
 
 .widget .widget-container .flag {
@@ -72,4 +83,13 @@
 
 .checkbox:checked{
   background: linear-gradient(180deg, #CDA5FF 0%, #7E18FF 76.04%);
+}
+
+.carousel img {
+  width: inherit;
+}
+
+input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 1; /* Firefox */
 }
