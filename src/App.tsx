@@ -40,7 +40,7 @@ function App() {
   }
 
   const onNext = (index: number) => {
-    
+
     if (index === 1 && !checkoutInfo.cost) {
       return
     }
@@ -63,7 +63,7 @@ function App() {
       || !checkoutInfo.zip
       || !checkoutInfo.country)
     ) {
-        return
+      return
     }
 
     carousel.current.moveTo(index)
