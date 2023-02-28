@@ -18,9 +18,6 @@ export function Checkout() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
     streetAddress: '',
     streetAddress2: '',
     city: '',
@@ -38,29 +35,27 @@ export function Checkout() {
     setCheckoutInfo(clonedCheckoutInfo)
   }
 
-  const onNext = (index: number) => {
-
-    if (index === 1 && !checkoutInfo.cost) {
+  const onNext = (index: number, data: CheckoutInfo) => {
+    setCheckoutInfo(data)
+    if (index === 1 && !data.cost) {
       return
     }
 
-    if (index === 2 && !checkoutInfo.paymentMethod) {
+    if (index === 2 && !data.paymentMethod) {
       return
     }
 
     if (index === 3 && (
-      !checkoutInfo.firstName
-      || !checkoutInfo.lastName
-      || !checkoutInfo.email
-      || !checkoutInfo.phoneNumber
-      || !checkoutInfo.cardNumber
-      || !checkoutInfo.expiry
-      || !checkoutInfo.cvc
-      || !checkoutInfo.streetAddress
-      || !checkoutInfo.city
-      || !checkoutInfo.state
-      || !checkoutInfo.zip
-      || !checkoutInfo.country)
+      !data.firstName
+      || !data.lastName
+      || !data.email
+      || !data.phoneNumber
+      || !data.tokenId
+      || !data.streetAddress
+      || !data.city
+      || !data.state
+      || !data.zip
+      || !data.country)
     ) {
       return
     }
@@ -88,29 +83,27 @@ export function Checkout() {
         >
           <TipAndSubTotal
             checkoutInfo={checkoutInfo}
-            onChange={onChangeCheckoutInfo}
-            onNext={() => onNext(1)}
+            onNext={(data) => onNext(1, data)}
           />
           <MethodAndTotal
             checkoutInfo={checkoutInfo}
             onChange={onChangeCheckoutInfo}
-            onNext={() => onNext(2)}
+            onNext={(data) => onNext(2, data)}
           />
           <CardDetails
             checkoutInfo={checkoutInfo}
-            onChange={onChangeCheckoutInfo}
-            onNext={() => onNext(0)}
+            onNext={(data) => onNext(3, data)}
           />
           <TransactionDetails
             checkoutInfo={checkoutInfo}
-            onNext={() => onNext(0)}
+            onNext={() => onNext(0, checkoutInfo)}
           />
         </Carousel>
         <div className="flex mt-8 mb-8">
-          <div onClick={() => onNext(0)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(1)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(2)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(3)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+          <div onClick={() => onNext(0, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+          <div onClick={() => onNext(1, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+          <div onClick={() => onNext(2, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+          <div onClick={() => onNext(3, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
         </div>
       </div>
     </div>

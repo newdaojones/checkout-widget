@@ -7,7 +7,7 @@ import { CheckoutInfo } from "../types/checkout.type";
 export const MethodAndTotal = ({ checkoutInfo, onChange, onNext }: {
   checkoutInfo: CheckoutInfo,
   onChange: (key: string, value: any) => void
-  onNext: () => void
+  onNext: (data: CheckoutInfo) => void
 }) => {
   const [confirmed, setConfirmed] = useState(false)
   return (
@@ -60,7 +60,7 @@ export const MethodAndTotal = ({ checkoutInfo, onChange, onNext }: {
       </div>
       <button
         disabled={!checkoutInfo.paymentMethod || !confirmed}
-        onClick={() => onNext()}
+        onClick={() => onNext(checkoutInfo)}
         className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${checkoutInfo.paymentMethod && confirmed ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
         Card Details
