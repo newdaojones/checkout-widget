@@ -64,47 +64,41 @@ export function Checkout() {
   }
 
   return (
-    <div className="app flex flex-col">
-      <div className='header flex justify-end items-center pl-8 pr-8'>
-        <input className='bg-transparent h-8 outline-none text-white mr-3' placeholder='Search' />
-        <a className='text-white underline font-bold text-lg' href='https://jxndao.com/storefront' target="_blank">Storefront</a>
-      </div>
-      <div className='widget'>
-        <Carousel
-          ref={carousel}
-          swipeable={false}
-          showArrows={false}
-          showThumbs={false}
-          showStatus={false}
-          showIndicators={false}
-          selectedItem={currentStep}
-          onChange={(index) => setCurrentStep(index)}
-          infiniteLoop={false}
-        >
-          <TipAndSubTotal
-            checkoutInfo={checkoutInfo}
-            onNext={(data) => onNext(1, data)}
-          />
-          <MethodAndTotal
-            checkoutInfo={checkoutInfo}
-            onChange={onChangeCheckoutInfo}
-            onNext={(data) => onNext(2, data)}
-          />
-          <CardDetails
-            checkoutInfo={checkoutInfo}
-            onNext={(data) => onNext(3, data)}
-          />
-          <TransactionDetails
-            checkoutInfo={checkoutInfo}
-            onNext={() => onNext(0, checkoutInfo)}
-          />
-        </Carousel>
-        <div className="flex mt-8 mb-8">
-          <div onClick={() => onNext(0, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(1, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(2, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-          <div onClick={() => onNext(3, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        </div>
+    <div className='widget'>
+      <Carousel
+        ref={carousel}
+        swipeable={false}
+        showArrows={false}
+        showThumbs={false}
+        showStatus={false}
+        showIndicators={false}
+        selectedItem={currentStep}
+        onChange={(index) => setCurrentStep(index)}
+        infiniteLoop={false}
+      >
+        <TipAndSubTotal
+          checkoutInfo={checkoutInfo}
+          onNext={(data) => onNext(1, data)}
+        />
+        <MethodAndTotal
+          checkoutInfo={checkoutInfo}
+          onChange={onChangeCheckoutInfo}
+          onNext={(data) => onNext(2, data)}
+        />
+        <CardDetails
+          checkoutInfo={checkoutInfo}
+          onNext={(data) => onNext(3, data)}
+        />
+        <TransactionDetails
+          checkoutInfo={checkoutInfo}
+          onNext={() => onNext(0, checkoutInfo)}
+        />
+      </Carousel>
+      <div className="flex mt-8 mb-8">
+        <div onClick={() => onNext(0, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => onNext(1, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => onNext(2, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => onNext(3, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
       </div>
     </div>
   );
