@@ -45,7 +45,7 @@ export const TipAndSubTotal = ({ checkoutInfo, onChange, onNext }: {
           <p className='text-white text-lg m-0 mr-5'> {checkoutInfo.cost ? (Number(checkoutInfo.cost) * 0.1).toFixed(2) : ''}</p>
           <div
             className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${checkoutInfo.tipPercent === '10' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-            onClick={() => onChange('pricePercent', '10')}
+            onClick={() => onChange('tipPercent', '10')}
           >
             10%
           </div>

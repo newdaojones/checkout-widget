@@ -9,10 +9,11 @@ export interface CheckoutInfo {
     cardNumber: string,
     expiry: string,
     cvc: string,
-    addressLine1: string,
-    addressLine2?: string,
+    streetAddress: string,
+    streetAddress2?: string,
     city: string,
     state: string,
     zip: string,
     country: string
+    tokenId: string
 }
