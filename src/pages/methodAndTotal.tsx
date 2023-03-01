@@ -1,15 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import UsdcIcon from '../assets/images/usdc-icon.png'
 import VisaIcon from '../assets/images/visa-icon.png'
 import UsFlagImage from '../assets/images/us-flag.png'
 import { CheckoutInfo } from "../types/checkout.type";
+import { useFormik } from "formik";
+import { paymentMethodSchema } from "../constants/validations";
 
-export const MethodAndTotal = ({ checkoutInfo, onChange, onNext }: {
+export const MethodAndTotal = ({ checkoutInfo, onNext }: {
   checkoutInfo: CheckoutInfo,
-  onChange: (key: string, value: any) => void
-  onNext: (data: CheckoutInfo) => void
+  onNext: (data: Partial<CheckoutInfo>) => void
 }) => {
-  const [confirmed, setConfirmed] = useState(false)
+  const onSubmit = (data: Partial<CheckoutInfo>) => {
+    onNext(data)
+  }
+  const { touched, errors, values, setFieldValue, isValid, submitForm } = useFormik<Partial<CheckoutInfo>>({
+    initialValues: {
+      paymentMethod: checkoutInfo.paymentMethod,
+      isConfirmedPurchase: checkoutInfo.isConfirmedPurchase
+    },
+    validationSchema: paymentMethodSchema,
+    onSubmit,
+  })
+
   return (
     <div className='widget-container flex flex-col'>
       <h3 className="text-white text-4xl mb-10 text-center">Method & Total</h3>
@@ -27,20 +39,21 @@ export const MethodAndTotal = ({ checkoutInfo, onChange, onNext }: {
         <p className="text-white text-lg text-left mb-2">+ Payment Fee</p>
         <div className="flex items-center justify-around">
           <button
-            onClick={() => onChange('paymentMethod', 'card')}
-            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${checkoutInfo.paymentMethod === 'card' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+            onClick={() => setFieldValue('paymentMethod', 'card')}
+            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.paymentMethod === 'card' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
           >
             <img src={VisaIcon} alt='' className="!w-8" />
           </button>
           <p className="text-white text-lg">OR</p>
           <button
             disabled
-            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${checkoutInfo.paymentMethod === 'usdc' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-            onClick={() => onChange('paymentMethod', 'usdc')}
+            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.paymentMethod === 'usdc' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+            onClick={() => setFieldValue('paymentMethod', 'usdc')}
           >
             <img src={UsdcIcon} alt='' className="!w-6" />
           </button>
         </div>
+        {touched.paymentMethod && errors.paymentMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.paymentMethod}</div>}
       </div>
       <p className="mt-2 text-white text-lg text-left">= Total</p>
       <div className="flex w-full">
@@ -54,14 +67,15 @@ export const MethodAndTotal = ({ checkoutInfo, onChange, onNext }: {
       </div>
       <div className="mt-6 mb-2 text-left">
         <label className="text-white text-xs cursor-pointer select-none">
-          <input className="checkbox" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+          <input className="checkbox" type="checkbox" checked={values.isConfirmedPurchase} onChange={(e) => setFieldValue('isConfirmedPurchase', e.target.checked)} />
           By checking this box you acknowledge your intent to make a purchase using the <span className="text-pink-500">Visa</span> | <span className="text-pink-500">Mastercard</span> checkout method provided by <span className="text-blue-400">Storefront</span>
         </label>
+        {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
       </div>
       <button
-        disabled={!checkoutInfo.paymentMethod || !confirmed}
-        onClick={() => onNext(checkoutInfo)}
-        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${checkoutInfo.paymentMethod && confirmed ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+        disabled={!isValid}
+        onClick={() => submitForm()}
+        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
         Card Details
       </button>

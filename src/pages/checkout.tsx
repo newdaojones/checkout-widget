@@ -24,7 +24,8 @@ export function Checkout() {
     state: '',
     zip: '',
     country: '',
-    tokenId: ''
+    tokenId: '',
+    isConfirmedPurchase: false
   })
 
   const onChangeCheckoutInfo = (key: string, value: any) => {
@@ -35,27 +36,31 @@ export function Checkout() {
     setCheckoutInfo(clonedCheckoutInfo)
   }
 
-  const onNext = (index: number, data: CheckoutInfo) => {
-    setCheckoutInfo(data)
-    if (index === 1 && !data.cost) {
+  const onNext = (index: number, data: Partial<CheckoutInfo>) => {
+    const values = {
+      ...checkoutInfo,
+      ...data
+    }
+    setCheckoutInfo(values)
+    if (index === 1 && !values.cost) {
       return
     }
 
-    if (index === 2 && !data.paymentMethod) {
+    if (index === 2 && !values.paymentMethod) {
       return
     }
 
     if (index === 3 && (
-      !data.firstName
-      || !data.lastName
-      || !data.email
-      || !data.phoneNumber
-      || !data.tokenId
-      || !data.streetAddress
-      || !data.city
-      || !data.state
-      || !data.zip
-      || !data.country)
+      !values.firstName
+      || !values.lastName
+      || !values.email
+      || !values.phoneNumber
+      || !values.tokenId
+      || !values.streetAddress
+      || !values.city
+      || !values.state
+      || !values.zip
+      || !values.country)
     ) {
       return
     }
@@ -82,7 +87,6 @@ export function Checkout() {
         />
         <MethodAndTotal
           checkoutInfo={checkoutInfo}
-          onChange={onChangeCheckoutInfo}
           onNext={(data) => onNext(2, data)}
         />
         <CardDetails

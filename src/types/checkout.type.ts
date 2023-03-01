@@ -13,4 +13,5 @@ export interface CheckoutInfo {
     zip: string,
     country: string
     tokenId: string
+    isConfirmedPurchase: boolean
 }

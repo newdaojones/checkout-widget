@@ -4,17 +4,20 @@ import UsFlagImage from '../assets/images/us-flag.png'
 import { tipAndSubTotalSchema as validationSchema } from "../constants/validations";
 import { CheckoutInfo } from "../types/checkout.type";
 
-export const TipAndSubTotal = ({ checkoutInfo: initialValues, onNext }: {
+export const TipAndSubTotal = ({ checkoutInfo, onNext }: {
   checkoutInfo: CheckoutInfo,
-  onNext: (data: CheckoutInfo) => void
+  onNext: (data: Partial<CheckoutInfo>) => void
 }) => {
   const [focusedCustomTip, setFocusedCustomTip] = useState(false)
-  const onSubmit = (data: CheckoutInfo) => {
+  const onSubmit = (data: Partial<CheckoutInfo>) => {
     onNext(data)
   };
 
-  const { values, setFieldValue, errors, touched, submitForm, isValid } = useFormik<CheckoutInfo>({
-    initialValues,
+  const { values, setFieldValue, errors, touched, submitForm, isValid } = useFormik<Partial<CheckoutInfo>>({
+    initialValues: {
+      cost: checkoutInfo.cost,
+      tipPercent: checkoutInfo.tipPercent
+    },
     validationSchema,
     onSubmit
   });

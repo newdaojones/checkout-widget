@@ -6,14 +6,26 @@ import { cardDetailsSchema } from "../constants/validations";
 
 export const CardDetails = ({ checkoutInfo, onNext }: {
   checkoutInfo: CheckoutInfo,
-  onNext: (data: CheckoutInfo) => void
+  onNext: (data: Partial<CheckoutInfo>) => void
 }) => {
-  const onSubmit = (data: CheckoutInfo) => {
+  const onSubmit = (data: Partial<CheckoutInfo>) => {
     onNext(data)
   };
 
-  const { values, setFieldValue, errors, touched, submitForm, isValid } = useFormik<CheckoutInfo>({
-    initialValues: checkoutInfo,
+  const { values, setFieldValue, errors, touched, submitForm, isValid } = useFormik<Partial<CheckoutInfo>>({
+    initialValues: {
+      firstName: checkoutInfo.firstName,
+      lastName: checkoutInfo.lastName,
+      email: checkoutInfo.email,
+      phoneNumber: checkoutInfo.phoneNumber,
+      tokenId: checkoutInfo.tokenId,
+      streetAddress: checkoutInfo.streetAddress,
+      streetAddress2: checkoutInfo.streetAddress2,
+      city: checkoutInfo.city,
+      state: checkoutInfo.state,
+      zip: checkoutInfo.zip,
+      country: checkoutInfo.country
+    },
     validationSchema: cardDetailsSchema,
     onSubmit
   });

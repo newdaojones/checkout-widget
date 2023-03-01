@@ -18,3 +18,8 @@ export const tipAndSubTotalSchema = yup.object().shape({
   cost: yup.number().required('The cost is required').positive().min(1, 'The cost must be greater than $1'),
   tipPercent: yup.number().positive('The tip amount must be positive')
 })
+
+export const paymentMethodSchema = yup.object().shape({
+  paymentMethod: yup.string().required('The payment method is required'),
+  isConfirmedPurchase: yup.boolean().isTrue('Please confirm for purchasing')
+})
