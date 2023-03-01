@@ -28,14 +28,6 @@ export function Checkout() {
     isConfirmedPurchase: false
   })
 
-  const onChangeCheckoutInfo = (key: string, value: any) => {
-    const clonedCheckoutInfo: any = _.cloneDeep(checkoutInfo)
-
-    clonedCheckoutInfo[key] = value;
-
-    setCheckoutInfo(clonedCheckoutInfo)
-  }
-
   const onNext = (index: number, data: Partial<CheckoutInfo>) => {
     const values = {
       ...checkoutInfo,

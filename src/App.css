@@ -93,3 +93,18 @@ input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;
   opacity: 1; /* Firefox */
 }
+
+.PhoneInput {
+  flex: 1;
+}
+
+.PhoneInputCountry {
+  color: white;
+}
+
+.PhoneInputInput {
+  background-color: transparent;
+  user-select: none;
+  color: white;
+  outline: none;
+}

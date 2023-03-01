@@ -3,6 +3,7 @@ import { CheckoutInfo } from "../types/checkout.type";
 import { Frames, CardNumber, ExpiryDate, Cvv } from 'frames-react';
 import { Formik, useFormik } from 'formik';
 import { cardDetailsSchema } from "../constants/validations";
+import PhoneInput from 'react-phone-number-input'
 
 export const CardDetails = ({ checkoutInfo, onNext }: {
   checkoutInfo: CheckoutInfo,
@@ -69,6 +70,14 @@ export const CardDetails = ({ checkoutInfo, onNext }: {
           placeholder="Email"
         />
         {touched.email && errors.email && <div className='text-red-400 text-[12px] text-left'>{errors.email}</div>}
+        <div className="flex mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
+          <PhoneInput
+            defaultCountry="US"
+            placeholder="Phone"
+            value={values.phoneNumber}
+            onChange={(e) => setFieldValue('phoneNumber', e)}
+          />
+        </div>
         <input
           value={values.phoneNumber}
           onChange={(e) => setFieldValue('phoneNumber', e.target.value)}
