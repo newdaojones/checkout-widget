@@ -90,7 +90,7 @@ export const CardDetails = ({ checkoutInfo, onNext }: {
         <Frames
           config={{
             debug: true,
-            publicKey: 'pk_test_6e40a700-d563-43cd-89d0-f9bb17d35e73',
+            publicKey: process.env.REACT_APP_CHECKOUT_PUBLIC_KEY as string,
             style: {
               base: {
                 fontSize: '18px',

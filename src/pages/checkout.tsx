@@ -6,8 +6,11 @@ import { CardDetails } from './cardDetails';
 import { TransactionDetails } from './transactionDetails';
 import { CheckoutInfo } from '../types/checkout.type';
 import { Carousel } from 'react-responsive-carousel';
+import { useMutation } from '@apollo/client';
+import { CREATE_CHECKOUT } from '../utils/graphql';
 
 export function Checkout() {
+  const [createCheckout, { data: checkoutResponse, loading, error }] = useMutation(CREATE_CHECKOUT);
   const carousel = useRef<any>()
   const [currentStep, setCurrentStep] = useState(0)
   const [checkoutInfo, setCheckoutInfo] = useState<CheckoutInfo>({
@@ -60,6 +63,36 @@ export function Checkout() {
     carousel.current.moveTo(index)
   }
 
+  const onSubmit = (data: Partial<CheckoutInfo>) => {
+    const values = {
+      ...checkoutInfo,
+      ...data
+    }
+
+    createCheckout({
+      variables: {
+        data: {
+          checkoutTokenId: values.tokenId,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          amount: Number(values.cost),
+          tip: values.tipPercent ? Number(values.tipPercent) : 0,
+          tipType: 'percent',
+          streetAddress: values.streetAddress,
+          streetAddress2: values.streetAddress2 || undefined,
+          city: values.city,
+          state: values.state,
+          zip: values.zip,
+          country: values.country || undefined,
+        }
+      }
+    })
+  }
+
+  console.log(checkoutResponse, error, loading)
+
   return (
     <div className='widget'>
       <Carousel
@@ -83,7 +116,7 @@ export function Checkout() {
         />
         <CardDetails
           checkoutInfo={checkoutInfo}
-          onNext={(data) => onNext(3, data)}
+          onNext={(data) => onSubmit(data)}
         />
         <TransactionDetails
           checkoutInfo={checkoutInfo}
