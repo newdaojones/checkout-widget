@@ -1,26 +1,22 @@
-import React from "react";
+import React, { useMemo } from "react";
 import UsdcIcon from '../assets/images/usdc-icon.png'
 import VisaIcon from '../assets/images/visa-icon.png'
 import UsFlagImage from '../assets/images/us-flag.png'
 import { CheckoutInfo } from "../types/checkout.type";
-import { useFormik } from "formik";
-import { paymentMethodSchema } from "../constants/validations";
+import { FormikProps } from "formik";
 
-export const MethodAndTotal = ({ checkoutInfo, onNext }: {
-  checkoutInfo: CheckoutInfo,
-  onNext: (data: Partial<CheckoutInfo>) => void
-}) => {
-  const onSubmit = (data: Partial<CheckoutInfo>) => {
-    onNext(data)
-  }
-  const { touched, errors, values, setFieldValue, isValid, submitForm } = useFormik<Partial<CheckoutInfo>>({
-    initialValues: {
-      paymentMethod: checkoutInfo.paymentMethod,
-      isConfirmedPurchase: checkoutInfo.isConfirmedPurchase
-    },
-    validationSchema: paymentMethodSchema,
-    onSubmit,
-  })
+interface Props extends FormikProps<CheckoutInfo> {
+  onNext: () => void
+}
+
+export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
+  const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
+  const total = useMemo(() => costWithTip + (values.cost && values.paymentMethod ? Number(values.cost) * Number(2) / 100 : 0), [costWithTip, values])
+
+  const isValid = useMemo(() =>
+    !errors.paymentMethod &&
+    !errors.isConfirmedPurchase,
+    [errors])
 
   return (
     <div className='widget-container flex flex-col'>
@@ -28,7 +24,7 @@ export const MethodAndTotal = ({ checkoutInfo, onNext }: {
       <p className="text-white text-lg text-left">Goods + Tip</p>
       <div className="flex w-full">
         <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-          {checkoutInfo.cost ? (Number(checkoutInfo.cost) + Number(checkoutInfo.cost) * Number(checkoutInfo.tipPercent || 0) / 100).toFixed(2) : ''}
+          {costWithTip.toFixed(2)}
         </div>
         <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
           <img src={UsFlagImage} alt='' className="flag mr-2" />
@@ -58,7 +54,7 @@ export const MethodAndTotal = ({ checkoutInfo, onNext }: {
       <p className="mt-2 text-white text-lg text-left">= Total</p>
       <div className="flex w-full">
         <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-          {checkoutInfo.cost ? (Number(checkoutInfo.cost) + Number(checkoutInfo.cost) * Number(checkoutInfo.tipPercent || 0) / 100).toFixed(2) : ''}
+          {total.toFixed(2)}
         </div>
         <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
           <img src={UsFlagImage} alt='' className="flag mr-2" />
@@ -74,7 +70,7 @@ export const MethodAndTotal = ({ checkoutInfo, onNext }: {
       </div>
       <button
         disabled={!isValid}
-        onClick={() => submitForm()}
+        onClick={() => onNext()}
         className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
         Card Details

@@ -4,6 +4,7 @@ export const CREATE_CHECKOUT = gql`
   mutation CreateCheckout($data: CheckoutInputType!) {
     createCheckout(data: $data) {
       id
+      walletAddress
       firstName
       lastName
       email
@@ -11,6 +12,7 @@ export const CREATE_CHECKOUT = gql`
       currency
       amount
       fee
+      feeType
       tip
       tipType
       streetAddress
@@ -19,14 +21,21 @@ export const CREATE_CHECKOUT = gql`
       state
       zip
       country
-      checkoutChargeId
-      checkoutStatus
-      checkoutPaidAt
-      primeTrustId
-      primeTrustStatus
-      primeTrustPaidAt
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const TRANSACTION_SUBSCRIPTION = gql`
+  subscription Transaction($checkoutId: String!) {
+    transaction(checkoutId: $checkoutId) {
+      checkoutId
+      step
+      status
+      message
+      transactionId
+      date
     }
   }
 `;

@@ -12,6 +12,8 @@ export interface CheckoutInfo {
     state: string,
     zip: string,
     country: string
-    tokenId: string
+    isValidCard: boolean
     isConfirmedPurchase: boolean
+    walletAddress: string
+    token: string
 }

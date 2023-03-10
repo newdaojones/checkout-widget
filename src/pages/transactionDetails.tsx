@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UsFlagImage from '../assets/images/us-flag.png'
 import VisaIcon from '../assets/images/visa-icon.png'
 import { CheckoutInfo } from "../types/checkout.type";
 import moment from 'moment-timezone'
-
-export const TransactionDetails = ({ checkoutInfo, onNext }: {
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import ClockLoader from 'react-spinners/ClockLoader'
+import { toast } from "react-toastify";
+export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
+  transaction?: any,
   checkoutInfo: CheckoutInfo,
   onNext: () => void
 }) => {
   const [confirmed, setConfirmed] = useState(false)
+
+  useEffect(() => {
+    if (transaction?.status === 'paid' || transaction?.status === 'error') {
+      setConfirmed(true)
+    }
+  }, [transaction])
+
   return (
     <div className='widget-container flex flex-col'>
       <h3 className="text-white text-4xl mb-10 text-center">[tx-status]</h3>
@@ -29,7 +39,7 @@ export const TransactionDetails = ({ checkoutInfo, onNext }: {
           <p className="text-white text-lg text-left">Payment Method</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-              Accepted
+              {!transaction || transaction?.step === 'Charge' ? 'Processing' : transaction.status === 'error' ? 'Failed' : 'Accepted'}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               <img src={VisaIcon} alt='' className="!w-8" />
@@ -39,9 +49,17 @@ export const TransactionDetails = ({ checkoutInfo, onNext }: {
         <div>
           <p className="text-white text-lg text-left">Transaction Status</p>
           <div className="flex w-full">
-            <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-center text-lg p-2 shadow-sm shadow-white">
-              0xbe53ca2 ... 9b77ccbf39
-            </div>
+            <CopyToClipboard
+              text={transaction?.transactionId ? `https://etherscan.io/tx/${transaction?.transactionId}` : ''}
+              onCopy={() => {
+                if (transaction?.transactionId) {
+                  toast.success('Copied transaction')
+                }
+              }}>
+              <div className="border-white border-2 cursor-pointer rounded-md h-11 bg-transparent flex-1 text-white text-md text-center text-lg p-2 shadow-sm shadow-white truncate overflow-hidden">
+                <div className="truncate overflow-ellipsis">{transaction?.transactionId}</div>
+              </div>
+            </CopyToClipboard>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               ETH TX ID
             </div>
@@ -51,23 +69,36 @@ export const TransactionDetails = ({ checkoutInfo, onNext }: {
           <p className="text-white text-lg text-left">Date</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-lg p-2 shadow-sm shadow-white text-center">
-              {moment().format('MM DD YYYY')}
+              {transaction?.date ? moment(transaction?.date).format('MM DD YYYY') : ''}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
-              {moment().format('HH:MM')}
+              {transaction?.date ? moment(transaction?.date).format('HH:mm') : ''}
             </div>
           </div>
         </div>
       </div>
-
-      <div className="mt-6 mb-2 text-left">
-        <label className="text-white text-xs cursor-pointer select-none">
-          <input className="checkbox" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
-          Check this box after you confirm that a copy of this receipt has been sent to your inbox
-        </label>
-      </div>
+      {(!transaction || transaction?.status === 'processing') && (
+        <div className="mt-6 mb-2 text-left">
+          <label className="text-white text-xs cursor-pointer select-none">
+            <input className="checkbox" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+            Check this box after you confirm that a copy of this receipt has been sent to your inbox
+          </label>
+        </div>
+      )}
+      {transaction?.status === 'processing' && (
+        <div className="flex mt-2">
+          <ClockLoader size={20} color='white' />
+          <div className="text-white ml-2 items-center">{transaction.message}</div>
+        </div>
+      )}
+      {transaction?.status === 'error' && (
+        <div className='text-red-400 mt-2'>{transaction.message}</div>
+      )}
+      {transaction?.status === 'paid' && (
+        <div className='text-green-500 mt-2'>{transaction.message}</div>
+      )}
       <button
-        onClick={() => onNext()}
+        onClick={() => confirmed && onNext()}
         className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${confirmed ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
         Close View

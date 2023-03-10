@@ -1,61 +1,102 @@
-import React, { useRef, useState } from 'react';
-import * as _ from 'lodash'
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { TipAndSubTotal } from './tipAndSubTotal';
 import { MethodAndTotal } from './methodAndTotal';
 import { CardDetails } from './cardDetails';
 import { TransactionDetails } from './transactionDetails';
 import { CheckoutInfo } from '../types/checkout.type';
 import { Carousel } from 'react-responsive-carousel';
-import { useMutation } from '@apollo/client';
-import { CREATE_CHECKOUT } from '../utils/graphql';
+import { useMutation, useSubscription } from '@apollo/client';
+import { CREATE_CHECKOUT, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import FadeLoader from 'react-spinners/FadeLoader';
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import { checkoutValidationSchema } from '../constants/validations';
 
 export function Checkout() {
-  const [createCheckout, { data: checkoutResponse, loading, error }] = useMutation(CREATE_CHECKOUT);
+  const [createCheckout, { data: checkoutResponse, loading: loadingCheckout, error, reset: resetCheckout }] = useMutation(CREATE_CHECKOUT);
+  const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
+    variables: {
+      checkoutId: checkoutResponse?.createCheckout?.id
+    }
+  })
+  const transaction = useMemo(() => transactionResponse?.transaction, [transactionResponse])
+
+  const onSubmitForm = (data: CheckoutInfo) => {
+    createCheckout({
+      variables: {
+        data: {
+          checkoutTokenId: data.token,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          amount: Number(data.cost),
+          tip: data.tipPercent ? Number(data.tipPercent) : 0,
+          tipType: 'percent',
+          fee: 2,
+          feeType: 'percent',
+          streetAddress: data.streetAddress,
+          streetAddress2: data.streetAddress2 || undefined,
+          city: data.city,
+          state: data.state,
+          zip: data.zip,
+          country: data.country || undefined,
+          walletAddress: data.walletAddress
+        }
+      }
+    })
+  }
+
+  const checkoutInfo = useFormik<CheckoutInfo>({
+    initialValues: {
+      cost: '',
+      tipPercent: '',
+      paymentMethod: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      streetAddress: '',
+      streetAddress2: '',
+      city: '',
+      state: '',
+      zip: '',
+      country: 'US',
+      isValidCard: false,
+      isConfirmedPurchase: false,
+      walletAddress: '',
+      token: ''
+    },
+    validateOnBlur: true,
+    validateOnChange: true,
+    validationSchema: checkoutValidationSchema,
+    onSubmit: onSubmitForm
+  });
+  const { values, errors, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
+
   const carousel = useRef<any>()
   const [currentStep, setCurrentStep] = useState(0)
-  const [checkoutInfo, setCheckoutInfo] = useState<CheckoutInfo>({
-    cost: '',
-    tipPercent: '',
-    paymentMethod: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    streetAddress: '',
-    streetAddress2: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: '',
-    tokenId: '',
-    isConfirmedPurchase: false
-  })
 
-  const onNext = (index: number, data: Partial<CheckoutInfo>) => {
-    const values = {
-      ...checkoutInfo,
-      ...data
-    }
-    setCheckoutInfo(values)
-    if (index === 1 && !values.cost) {
+  const onNext = (index: number) => {
+    if (index === 1 && (!values.cost || errors.cost || errors.tipPercent)) {
       return
     }
 
-    if (index === 2 && !values.paymentMethod) {
+    if (index === 2 && (errors.paymentMethod || errors.isConfirmedPurchase)) {
       return
     }
 
     if (index === 3 && (
-      !values.firstName
-      || !values.lastName
-      || !values.email
-      || !values.phoneNumber
-      || !values.tokenId
-      || !values.streetAddress
-      || !values.city
-      || !values.state
-      || !values.zip
-      || !values.country)
+      errors.firstName ||
+      errors.lastName ||
+      errors.email ||
+      errors.phoneNumber ||
+      errors.country ||
+      errors.zip ||
+      errors.state ||
+      errors.city ||
+      errors.streetAddress ||
+      errors.streetAddress2)
     ) {
       return
     }
@@ -63,35 +104,61 @@ export function Checkout() {
     carousel.current.moveTo(index)
   }
 
-  const onSubmit = (data: Partial<CheckoutInfo>) => {
-    const values = {
-      ...checkoutInfo,
-      ...data
-    }
-
-    createCheckout({
-      variables: {
-        data: {
-          checkoutTokenId: values.tokenId,
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          phoneNumber: values.phoneNumber,
-          amount: Number(values.cost),
-          tip: values.tipPercent ? Number(values.tipPercent) : 0,
-          tipType: 'percent',
-          streetAddress: values.streetAddress,
-          streetAddress2: values.streetAddress2 || undefined,
-          city: values.city,
-          state: values.state,
-          zip: values.zip,
-          country: values.country || undefined,
-        }
-      }
+  const onResetForm = () => {
+    setValues({
+      cost: '',
+      tipPercent: '',
+      paymentMethod: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      streetAddress: '',
+      streetAddress2: '',
+      city: '',
+      state: '',
+      zip: '',
+      country: 'US',
+      isValidCard: false,
+      isConfirmedPurchase: false,
+      walletAddress: '',
+      token: ''
     })
+    setErrors({})
+    setTouched({})
+    resetCheckout()
+    onNext(0)
   }
 
-  console.log(checkoutResponse, error, loading)
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message)
+      setFieldValue('isValidCard', false)
+      setFieldValue('token', '')
+      onNext(0)
+      resetCheckout()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, setFieldValue])
+
+  useEffect(() => {
+    if (checkoutResponse?.createCheckout?.id) {
+      onNext(3)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutResponse])
+
+  useEffect(() => {
+    if (transaction?.status === 'error') {
+      toast.error(transaction.message)
+    }
+  }, [transaction])
+
+  useEffect(() => {
+    if (transaction?.status === 'paid') {
+      toast.success(transaction.message)
+    }
+  }, [transaction])
 
   return (
     <div className='widget'>
@@ -107,28 +174,34 @@ export function Checkout() {
         infiniteLoop={false}
       >
         <TipAndSubTotal
-          checkoutInfo={checkoutInfo}
-          onNext={(data) => onNext(1, data)}
+          {...checkoutInfo}
+          onNext={() => onNext(1)}
         />
         <MethodAndTotal
-          checkoutInfo={checkoutInfo}
-          onNext={(data) => onNext(2, data)}
+          {...checkoutInfo}
+          onNext={() => onNext(2)}
         />
-        <CardDetails
-          checkoutInfo={checkoutInfo}
-          onNext={(data) => onSubmit(data)}
-        />
+        {currentStep === 2 ? <CardDetails
+          {...checkoutInfo}
+        /> : <></>}
         <TransactionDetails
-          checkoutInfo={checkoutInfo}
-          onNext={() => onNext(0, checkoutInfo)}
+          transaction={transactionResponse?.transaction}
+          checkoutInfo={values}
+          onNext={() => onResetForm()}
         />
       </Carousel>
       <div className="flex mt-8 mb-8">
-        <div onClick={() => onNext(0, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        <div onClick={() => onNext(1, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        <div onClick={() => onNext(2, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        <div onClick={() => onNext(3, checkoutInfo)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => currentStep !== 3 && onNext(0)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => currentStep !== 3 && onNext(1)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div onClick={() => currentStep !== 3 && onNext(2)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
       </div>
+      {(loadingCheckout) && (
+        <div className="absolute w-full h-full bg-white/10 flex flex-col items-center justify-center top-0">
+          <FadeLoader color="white" />
+          <div className='mt-2 text-black'>Sending request...</div>
+        </div>
+      )}
     </div>
   );
 }
