@@ -33,6 +33,7 @@ export const TRANSACTION_SUBSCRIPTION = gql`
       checkoutId
       step
       status
+      paidStatus
       message
       transactionId
       date

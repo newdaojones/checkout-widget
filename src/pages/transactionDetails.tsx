@@ -6,6 +6,7 @@ import moment from 'moment-timezone'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ClockLoader from 'react-spinners/ClockLoader'
 import { toast } from "react-toastify";
+import _ from 'lodash'
 export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
   transaction?: any,
   checkoutInfo: CheckoutInfo,
@@ -14,20 +15,20 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
   const [confirmed, setConfirmed] = useState(false)
 
   useEffect(() => {
-    if (transaction?.status === 'paid' || transaction?.status === 'error') {
+    if (transaction?.paidStatus === 'paid' || transaction?.paidStatus === 'error') {
       setConfirmed(true)
     }
   }, [transaction])
 
   return (
     <div className='widget-container flex flex-col'>
-      <h3 className="text-white text-4xl mb-10 text-center">[tx-status]</h3>
+      <h3 className="text-white text-4xl mb-10 text-center">{!transaction ? 'Pending' : `${_.capitalize(transaction.status)} - ${_.capitalize(transaction.step)}`}</h3>
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <p className="text-white text-lg text-left">Amount</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-              {checkoutInfo.cost ? (Number(checkoutInfo.cost) + Number(checkoutInfo.cost) * Number(checkoutInfo.tipPercent || 0) / 100).toFixed(2) : ''}
+              {checkoutInfo.cost ? (Number(checkoutInfo.cost)).toFixed(2) : ''}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               <img src={UsFlagImage} alt='' className="flag mr-2" />
@@ -39,7 +40,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           <p className="text-white text-lg text-left">Payment Method</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-              {!transaction || transaction?.step === 'Charge' ? 'Processing' : transaction.status === 'error' ? 'Failed' : 'Accepted'}
+              {(!transaction || (transaction?.step === 'Charge' && transaction.status === 'processing')) ? 'Processing' : transaction.paidStatus === 'error' ? 'Failed' : 'Accepted'}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               <img src={VisaIcon} alt='' className="!w-8" />
@@ -77,7 +78,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           </div>
         </div>
       </div>
-      {(!transaction || transaction?.status === 'processing') && (
+      {(!transaction || transaction?.paidStatus === 'processing') && (
         <div className="mt-6 mb-2 text-left">
           <label className="text-white text-xs cursor-pointer select-none">
             <input className="checkbox" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
@@ -85,16 +86,16 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           </label>
         </div>
       )}
-      {transaction?.status === 'processing' && (
+      {transaction?.paidStatus === 'processing' && (
         <div className="flex mt-2">
           <ClockLoader size={20} color='white' />
           <div className="text-white ml-2 items-center">{transaction.message}</div>
         </div>
       )}
-      {transaction?.status === 'error' && (
+      {transaction?.paidStatus === 'error' && (
         <div className='text-red-400 mt-2'>{transaction.message}</div>
       )}
-      {transaction?.status === 'paid' && (
+      {transaction?.paidStatus === 'paid' && (
         <div className='text-green-500 mt-2'>{transaction.message}</div>
       )}
       <button

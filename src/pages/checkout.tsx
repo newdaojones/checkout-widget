@@ -33,7 +33,7 @@ export function Checkout() {
           amount: Number(data.cost),
           tip: data.tipPercent ? Number(data.tipPercent) : 0,
           tipType: 'percent',
-          fee: 2,
+          fee: 0,
           feeType: 'percent',
           streetAddress: data.streetAddress,
           streetAddress2: data.streetAddress2 || undefined,
@@ -149,13 +149,13 @@ export function Checkout() {
   }, [checkoutResponse])
 
   useEffect(() => {
-    if (transaction?.status === 'error') {
+    if (transaction?.paidStatus === 'error') {
       toast.error(transaction.message)
     }
   }, [transaction])
 
   useEffect(() => {
-    if (transaction?.status === 'paid') {
+    if (transaction?.paidStatus === 'paid') {
       toast.success(transaction.message)
     }
   }, [transaction])

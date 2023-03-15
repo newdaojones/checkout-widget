@@ -11,7 +11,7 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
   const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
-  const total = useMemo(() => costWithTip + (values.cost && values.paymentMethod ? Number(values.cost) * Number(2) / 100 : 0), [costWithTip, values])
+  // const total = useMemo(() => costWithTip + (values.cost && values.paymentMethod ? Number(values.cost) * Number(2) / 100 : 0), [costWithTip, values])
 
   const isValid = useMemo(() =>
     !errors.paymentMethod &&
@@ -54,7 +54,7 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
       <p className="mt-2 text-white text-lg text-left">= Total</p>
       <div className="flex w-full">
         <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-          {total.toFixed(2)}
+          {costWithTip.toFixed(2)}
         </div>
         <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
           <img src={UsFlagImage} alt='' className="flag mr-2" />

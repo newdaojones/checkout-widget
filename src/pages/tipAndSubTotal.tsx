@@ -62,7 +62,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         {focusedCustomTip ?
           <input
             value={[10, 15, 20].includes(Number(values.tipPercent)) ? undefined : values.tipPercent}
-            placeholder="??%"
+            placeholder=""
             autoFocus
             onBlur={() => setFocusedCustomTip(false)}
             onChange={(e) => setFieldValue && setFieldValue('tipPercent', e.target.value)}
@@ -72,7 +72,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
             className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
             onClick={() => setFocusedCustomTip(true)}
           >
-            {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '??%'}
+            {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '?%'}
           </div>
         }
       </div>
