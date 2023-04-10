@@ -27,6 +27,20 @@ export const CREATE_CHECKOUT = gql`
   }
 `;
 
+export const GET_CHECKOUT_REQUEST = gql`
+  query CheckoutRequest($id: String!) {
+    checkoutRequest(id: $id) {
+      id
+      partnerOrderId
+      walletAddress
+      email
+      phoneNumber
+      amount
+      status
+    }
+  }
+`
+
 export const TRANSACTION_SUBSCRIPTION = gql`
   subscription Transaction($checkoutId: String!) {
     transaction(checkoutId: $checkoutId) {

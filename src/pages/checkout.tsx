@@ -5,14 +5,28 @@ import { CardDetails } from './cardDetails';
 import { TransactionDetails } from './transactionDetails';
 import { CheckoutInfo } from '../types/checkout.type';
 import { Carousel } from 'react-responsive-carousel';
-import { useMutation, useSubscription } from '@apollo/client';
-import { CREATE_CHECKOUT, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { CREATE_CHECKOUT, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import { checkoutValidationSchema } from '../constants/validations';
+import { useNavigate, useParams } from 'react-router-dom';
+
+interface QueryParams {
+  checkoutRequestId: string;
+}
 
 export function Checkout() {
+  const { checkoutRequestId } = useParams();
+  const navigate = useNavigate();
+
+  const { data: checkoutRequest, error: checkoutRequestError } = useQuery(GET_CHECKOUT_REQUEST, {
+    variables: {
+      id: checkoutRequestId
+    }
+  })
+
   const [createCheckout, { data: checkoutResponse, loading: loadingCheckout, error, reset: resetCheckout }] = useMutation(CREATE_CHECKOUT);
   const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
     variables: {
@@ -41,7 +55,8 @@ export function Checkout() {
           state: data.state,
           zip: data.zip,
           country: data.country || undefined,
-          walletAddress: data.walletAddress
+          walletAddress: data.walletAddress,
+          checkoutRequestId
         }
       }
     })
@@ -127,6 +142,7 @@ export function Checkout() {
     setErrors({})
     setTouched({})
     resetCheckout()
+    navigate('/')
     onNext(0)
   }
 
@@ -160,6 +176,21 @@ export function Checkout() {
     }
   }, [transaction])
 
+  useEffect(() => {
+    if (checkoutRequest) {
+      setFieldValue('cost', checkoutRequest.checkoutRequest.amount)
+      setFieldValue('walletAddress', checkoutRequest.checkoutRequest.walletAddress)
+      setFieldValue('phoneNumber', checkoutRequest.checkoutRequest.phoneNumber)
+      setFieldValue('email', checkoutRequest.checkoutRequest.email)
+    }
+  }, [checkoutRequest, setFieldValue])
+
+  useEffect(() => {
+    if (checkoutRequestError) {
+      toast.error(checkoutRequestError.message)
+    }
+  }, [checkoutRequestError])
+
   return (
     <div className='widget'>
       <Carousel
@@ -175,13 +206,15 @@ export function Checkout() {
       >
         <TipAndSubTotal
           {...checkoutInfo}
+          checkoutRequestId={checkoutRequestId}
           onNext={() => onNext(1)}
         />
         <MethodAndTotal
           {...checkoutInfo}
           onNext={() => onNext(2)}
-        />
+          />
         {currentStep === 2 ? <CardDetails
+          checkoutRequestId={checkoutRequestId}
           {...checkoutInfo}
         /> : <></>}
         <TransactionDetails

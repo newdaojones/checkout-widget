@@ -5,9 +5,10 @@ import { CheckoutInfo } from "../types/checkout.type";
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
+  checkoutRequestId?: string
 }
 
-export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched, setFieldTouched }: Props) => {
+export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched, setFieldTouched, checkoutRequestId }: Props) => {
   const [focusedCustomTip, setFocusedCustomTip] = useState(false)
   const isValid = useMemo(() => values.cost && !errors.cost && !errors.tipPercent, [errors, values])
 
@@ -18,6 +19,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
       <input
         value={values.cost}
         placeholder={'0.00'}
+        disabled={!!checkoutRequestId}
         onBlur={() => setFieldTouched('cost', true)}
         onChange={(e) => setFieldValue && setFieldValue('cost', e.target.value)}
         className="border-white outline-none border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white"
