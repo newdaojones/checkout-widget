@@ -24,7 +24,8 @@ export function Checkout() {
   const { data: checkoutRequest, error: checkoutRequestError } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
       id: checkoutRequestId
-    }
+    },
+    skip: !checkoutRequestId
   })
 
   const [createCheckout, { data: checkoutResponse, loading: loadingCheckout, error, reset: resetCheckout }] = useMutation(CREATE_CHECKOUT);
