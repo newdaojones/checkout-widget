@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import moment from 'moment-timezone';
 import { TipAndSubTotal } from './tipAndSubTotal';
 import { MethodAndTotal } from './methodAndTotal';
 import { CardDetails } from './cardDetails';
@@ -20,6 +21,10 @@ interface QueryParams {
 export function Checkout() {
   const { checkoutRequestId } = useParams();
   const navigate = useNavigate();
+
+  const SocureInitializer = (window as any).SocureInitializer
+  const devicer = (window as any).devicer
+  const Socure = (window as any).Socure
 
   const { data: checkoutRequest, error: checkoutRequestError } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
@@ -57,7 +62,12 @@ export function Checkout() {
           zip: data.zip,
           country: data.country || undefined,
           walletAddress: data.walletAddress,
-          checkoutRequestId
+          checkoutRequestId,
+          dob: data.dob ? moment(data.dob).format('YYYY-MM-DD') : undefined,
+          taxId: data.taxId,
+          gender: data.gender || 'male',
+          deviceId,
+          documentId
         }
       }
     })
@@ -92,6 +102,10 @@ export function Checkout() {
 
   const carousel = useRef<any>()
   const [currentStep, setCurrentStep] = useState(0)
+  const [documentId, setDocumentId] = useState<string>()
+  const [deviceId, setDeviceId] = useState<string>()
+  const totalAmount = useMemo(() => values.cost ? (Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100) : 0, [values])
+  const isRequiredSocure = useMemo(() => totalAmount >= 500, [totalAmount])
 
   const onNext = (index: number) => {
     if (index === 1 && (!values.cost || errors.cost || errors.tipPercent)) {
@@ -138,7 +152,10 @@ export function Checkout() {
       isValidCard: false,
       isConfirmedPurchase: false,
       walletAddress: '',
-      token: ''
+      token: '',
+      taxId: '',
+      gender: 'male',
+      dob: undefined
     })
     setErrors({})
     setTouched({})
@@ -150,6 +167,7 @@ export function Checkout() {
   useEffect(() => {
     if (error) {
       toast.error(error.message)
+      cleanSocure()
       setFieldValue('isValidCard', false)
       setFieldValue('token', '')
       onNext(0)
@@ -192,8 +210,61 @@ export function Checkout() {
     }
   }, [checkoutRequestError])
 
+  const initSourcer = () => {
+    var config = {
+      onProgress: (res: any) => {},
+      onSuccess: (res: any) => {
+        console.log(res)
+        if (res.status === 'DOCUMENTS_UPLOADED') {
+          setDocumentId(res.documentUuid)
+        }
+      },
+      onError: (err: any) => {
+        toast.error('Failed verify your identify, please try again')
+        Socure.cleanup()
+      },
+      qrCodeNeeded: true //toggle the QR code display
+    };
+    SocureInitializer.init(process.env.REACT_APP_WS_URL)
+      .then((lib: any) => {
+        lib.init(process.env.REACT_APP_WS_URL, "#socure", config).then(function () {
+          lib.start(1);
+        })
+      }).catch((err: any) => {
+      })
+  }
+
+  const getDeviceId = () => {
+    var deviceFPOptions = {
+      publicKey: process.env.REACT_APP_WS_URL,
+      userConsent: true,
+      context: 'signup'
+    };
+    devicer.run(deviceFPOptions, function (response: any) {
+      console.log(response)
+      setDeviceId(response.sessionId)
+    })
+  }
+
+  const cleanSocure = () => {
+    setDeviceId(undefined)
+    setDocumentId(undefined)
+    Socure?.cleanup()
+  }
+
+  useEffect(() => {
+    if (isRequiredSocure) {
+      initSourcer()
+      getDeviceId()
+    }
+
+    return () => {
+      cleanSocure()
+    }
+  }, [isRequiredSocure])
+
   return (
-    <div className='widget'>
+    <div className={`widget ${isRequiredSocure && !documentId && currentStep === 2 ? 'white' : ''}`}>
       <Carousel
         ref={carousel}
         swipeable={false}
@@ -213,11 +284,13 @@ export function Checkout() {
         <MethodAndTotal
           {...checkoutInfo}
           onNext={() => onNext(2)}
-          />
-        {currentStep === 2 ? <CardDetails
-          checkoutRequestId={checkoutRequestId}
-          {...checkoutInfo}
-        /> : <></>}
+        />
+        {(isRequiredSocure && !documentId) ? (<div id='socure' />) : <>{
+          currentStep === 2 ? <CardDetails
+            checkoutRequestId={checkoutRequestId}
+            {...checkoutInfo}
+          /> : <></>
+        }</>}
         <TransactionDetails
           transaction={transactionResponse?.transaction}
           checkoutInfo={values}

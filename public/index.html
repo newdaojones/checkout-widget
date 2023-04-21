@@ -26,6 +26,8 @@
     -->
     <title>Checkout</title>
     <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
+    <script type="text/javascript" src="https://websdk.socure.com/bundle.js"></script>
+    <script type="text/javascript" src="https://js.dvnfo.com/devicer.min.js"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -40,5 +42,15 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <!-- <script type="text/javascript">
+      var deviceFPOptions = {
+              publicKey: '9b8691a1-d1ff-4f1d-9d43-381d5e9923db',
+              userConsent: true,
+              context: 'signup'
+          };
+          devicer.run(deviceFPOptions, function(response) {
+              console.log(response);
+          })
+      </script> -->
   </body>
 </html>

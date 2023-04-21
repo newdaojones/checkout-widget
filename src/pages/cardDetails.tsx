@@ -6,12 +6,17 @@ import PhoneInput from 'react-phone-number-input'
 import ClockLoader from 'react-spinners/ClockLoader'
 import { checkoutConfig } from "../utils/checkout";
 import web3 from 'web3'
+import DatePicker from "react-datepicker";
+
 interface Props extends FormikProps<CheckoutInfo> {
   checkoutRequestId?: string;
 }
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequestId }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
+  const totalAmount = useMemo(() => values.cost ? (Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100) : 0, [values])
+  const isRequiredSocure = useMemo(() => totalAmount >= 500, [totalAmount])
+
   const onFrameValidationChanged = (e: any) => {
     setFieldTouched('isValidCard', true, false)
     setFieldValue('isValidCard', e.isValid)
@@ -55,7 +60,9 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     !errors.city &&
     !errors.streetAddress &&
     !errors.streetAddress2 &&
-    !errors.isValidCard, [errors])
+    (!isRequiredSocure || (isRequiredSocure && values.dob)) &&
+    (!isRequiredSocure || (isRequiredSocure && values.taxId)) &&
+    !errors.isValidCard, [errors, values])
 
   const onSubmit = () => {
     if (!isValid || isLoading) {
@@ -85,22 +92,63 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           placeholder="Wallet Address"
         />
         {touched.walletAddress && errors.walletAddress && <div className='text-red-400 text-[12px] text-left'>{errors.walletAddress}</div>}
-        <input
-          value={values.firstName}
-          onBlur={() => setFieldTouched('firstName', true)}
-          onChange={(e) => setFieldValue('firstName', e.target.value)}
-          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-          placeholder="First Name"
-        />
-        {touched.firstName && errors.firstName && <div className='text-red-400 text-[12px] text-left'>{errors.firstName}</div>}
-        <input
-          value={values.lastName}
-          onBlur={() => setFieldTouched('lastName', true)}
-          onChange={(e) => setFieldValue('lastName', e.target.value)}
-          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-          placeholder="Last Name"
-        />
-        {touched.lastName && errors.lastName && <div className='text-red-400 text-[12px] text-left'>{errors.lastName}</div>}
+        <div
+          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
+          <div className="flex-1">
+            <input
+              value={values.firstName}
+              onBlur={() => setFieldTouched('firstName', true)}
+              onChange={(e) => setFieldValue('firstName', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="First Name" />
+          </div>
+          <div className="flex-1">
+            <input
+              value={values.lastName}
+              onBlur={() => setFieldTouched('lastName', true)}
+              onChange={(e) => setFieldValue('lastName', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Last Name" />
+          </div>
+        </div>
+        <div className="flex">
+          <div className="flex-1">
+            {touched.firstName && errors.firstName && <div className='text-red-400 text-[12px] text-left'>{errors.firstName}</div>}
+          </div>
+          <div className="flex-1">
+            {touched.lastName && errors.lastName && <div className='text-red-400 text-[12px] text-left'>{errors.lastName}</div>}
+          </div>
+        </div>
+        <div
+          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
+          <div className="flex-1">
+            <DatePicker
+              className="bg-transparent placeholder-white text-lg outline-none w-full"
+              selected={values.dob}
+              showMonthDropdown={true}
+              showYearDropdown={true}
+              placeholderText="Date of Birth"
+              openToDate={new Date("1993/09/28")}
+              onBlur={() => setFieldTouched('dob', true)}
+              onChange={(date) => setFieldValue('dob', date)}
+            />
+          </div>
+          <div className="flex-1">
+            <select
+              onBlur={() => setFieldTouched('gender', true)}
+              onChange={(e) => setFieldValue('gender', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Last Name">
+              <option selected={values.gender === 'male'} value="male">Male</option>
+              <option selected={values.gender === 'female'} value="female">Female</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex">
+          <div className="flex-1">
+            {touched.dob && !values.dob && <div className='text-red-400 text-[12px] text-left'>Date of Birth is required</div>}
+          </div>
+          <div className="flex-1">
+            {touched.gender && errors.gender && <div className='text-red-400 text-[12px] text-left'>{errors.gender}</div>}
+          </div>
+        </div>
       </div>
       <div className="flex-1 flex flex-col justify-center mt-3">
         <input
@@ -140,7 +188,15 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
         </Frames>
         {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
-        <div className="mt-10 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
+        <input
+          value={values.taxId}
+          onBlur={() => setFieldTouched('taxId', true)}
+          onChange={(e) => setFieldValue('taxId', e.target.value)}
+          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
+          placeholder="Tax Number ID"
+        />
+        {touched.taxId && !values.taxId && <div className='text-red-400 text-[12px] text-left'>Tax Number ID is required</div>}
+        <div className="mt-5 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
             <input
               value={values.country}

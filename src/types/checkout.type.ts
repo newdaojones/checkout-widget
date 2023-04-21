@@ -16,4 +16,7 @@ export interface CheckoutInfo {
     isConfirmedPurchase: boolean
     walletAddress: string
     token: string
+    dob?: Date,
+    gender?: string
+    taxId?: string
 }

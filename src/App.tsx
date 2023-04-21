@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import 'react-toastify/dist/ReactToastify.css';
+import "react-datepicker/dist/react-datepicker.css";
 import { Checkout } from './pages/checkout';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './services';
