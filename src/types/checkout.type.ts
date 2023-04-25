@@ -5,6 +5,8 @@ export interface CheckoutInfo {
     firstName: string,
     lastName: string,
     email: string,
+    auth?: string,
+    password?: string,
     phoneNumber: string,
     streetAddress: string,
     streetAddress2?: string,

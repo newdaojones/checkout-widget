@@ -4,12 +4,14 @@ import VisaIcon from '../assets/images/visa-icon.png'
 import UsFlagImage from '../assets/images/us-flag.png'
 import { CheckoutInfo } from "../types/checkout.type";
 import { FormikProps } from "formik";
+import { useAuth } from "../context/auth";
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
 }
 
 export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
+  const { user } = useAuth();
   const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
   // const total = useMemo(() => costWithTip + (values.cost && values.paymentMethod ? Number(values.cost) * Number(2) / 100 : 0), [costWithTip, values])
 
@@ -73,7 +75,7 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
         onClick={() => onNext()}
         className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
-        Card Details
+        {user ? 'Card Details' : 'Login'}
       </button>
     </div>)
 }

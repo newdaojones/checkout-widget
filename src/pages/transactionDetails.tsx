@@ -28,7 +28,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           <p className="text-white text-lg text-left">Amount</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-              {checkoutInfo.cost ? (Number(checkoutInfo.cost)).toFixed(2) : ''}
+              {checkoutInfo.cost ? (Number(checkoutInfo.cost) + Number(checkoutInfo.cost) * Number(checkoutInfo.tipPercent || 0) / 100).toFixed(2) : ''}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               <img src={UsFlagImage} alt='' className="flag mr-2" />

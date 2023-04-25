@@ -114,10 +114,6 @@ input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   outline: none;
 }
 
-#socure img {
-  width: inherit !important;
-}
-
 .p-2 {
   padding: 0.5rem !important;
 }

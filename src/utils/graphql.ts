@@ -27,6 +27,57 @@ export const CREATE_CHECKOUT = gql`
   }
 `;
 
+export const CREATE_CHECKOUT_WITHOUT_USER = gql`
+  mutation CreateCheckoutWithoutUser($data: CheckoutInputType!) {
+    createCheckoutWithoutUser(data: $data) {
+      id
+      walletAddress
+      firstName
+      lastName
+      email
+      phoneNumber
+      currency
+      amount
+      fee
+      feeType
+      tip
+      tipType
+      streetAddress
+      streetAddress2
+      city
+      state
+      zip
+      country
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_ACCOUNT = gql`
+  mutation CreateUser($data: UserInputType!) {
+    createUser(data: $data) {
+      id
+      firstName
+      lastName
+      email
+      phoneNumber
+      gender
+      dob
+      taxId
+      streetAddress
+      streetAddress2
+      city
+      state
+      zip
+      country
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const GET_CHECKOUT_REQUEST = gql`
   query CheckoutRequest($id: String!) {
     checkoutRequest(id: $id) {
@@ -37,6 +88,30 @@ export const GET_CHECKOUT_REQUEST = gql`
       phoneNumber
       amount
       status
+    }
+  }
+`
+
+export const GET_ME = gql`
+  query Me {
+    me {
+      id
+      firstName
+      lastName
+      email
+      phoneNumber
+      gender
+      dob
+      taxId
+      streetAddress
+      streetAddress2
+      city
+      state
+      zip
+      country
+      isVerified
+      createdAt
+      updatedAt
     }
   }
 `
@@ -54,3 +129,13 @@ export const TRANSACTION_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const ACCOUNT_VERIFY = gql`
+subscription UserVerify($userId: String!) {
+  userVerify(userId: $userId) {
+    userId
+    status
+    error
+    token
+  }
+}`

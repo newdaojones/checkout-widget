@@ -1,91 +1,44 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FormikProps } from "formik";
+import React, { useMemo, useState } from "react";
 import { CheckoutInfo } from "../types/checkout.type";
-import { Frames, CardNumber, ExpiryDate, Cvv } from 'frames-react';
-import { FormikProps } from 'formik';
 import PhoneInput from 'react-phone-number-input'
-import ClockLoader from 'react-spinners/ClockLoader'
-import { checkoutConfig } from "../utils/checkout";
-import web3 from 'web3'
+import DatePicker from "react-datepicker";
+
 interface Props extends FormikProps<CheckoutInfo> {
-  checkoutRequestId?: string;
+  onNext: () => void
+  checkoutRequestId?: string
 }
 
-export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequestId }: Props) => {
-  const [isLoading, setIsLoading] = useState(false)
-
-  const onFrameValidationChanged = (e: any) => {
-    setFieldTouched('isValidCard', true, false)
-    setFieldValue('isValidCard', e.isValid)
-  }
-  const ref = useRef<any>()
-
-  const onValidateWalletAddress = () => {
-    if (values.walletAddress && !web3.utils.isAddress(values.walletAddress)) {
-      setFieldTouched('walletAddress', true, false)
-      setFieldError('walletAddress', 'Wallet Address is invalid')
-    }
-  }
-
-  const onGenerateTokenFailed = (e: any) => {
-    Frames.init(checkoutConfig)
-    setFieldValue('isValidCard', false)
-    setFieldValue('token', '')
-    setIsLoading(false)
-  }
-
-  const onGenerate = (e: any) => {
-    setFieldValue('token', e.token);
-  }
-
-  useEffect(() => {
-    if (values.isValidCard && values.token && isLoading) {
-      submitForm()
-      setIsLoading(false)
-    }
-  }, [values, submitForm, isLoading])
-
+export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTouched, setFieldValue, onNext }: Props) => {
   const isValid = useMemo(() =>
     !errors.firstName &&
     !errors.lastName &&
-    !errors.walletAddress &&
+    !errors.dob &&
     !errors.email &&
     !errors.phoneNumber &&
-    !errors.country &&
-    !errors.zip &&
-    !errors.state &&
-    !errors.city &&
+    !errors.taxId &&
+    !errors.password &&
     !errors.streetAddress &&
-    !errors.streetAddress2 &&
-    !errors.isValidCard, [errors, values])
+    !errors.city &&
+    !errors.state &&
+    !errors.zip &&
+    values.firstName &&
+    values.lastName &&
+    values.dob &&
+    values.email &&
+    values.phoneNumber &&
+    values.taxId &&
+    values.password &&
+    values.streetAddress &&
+    values.city &&
+    values.state &&
+    values.zip
+    , [values, errors])
 
-  const onSubmit = () => {
-    if (!isValid || isLoading) {
-      return
-    }
-
-    if (values.walletAddress && !web3.utils.isAddress(values.walletAddress)) {
-      setFieldTouched('walletAddress', true, false)
-      setFieldError('walletAddress', 'Wallet address is invalid')
-      return
-    }
-
-    Frames.submitCard()
-    setIsLoading(true)
-  }
-
-  return (
-    <div className='widget-container flex flex-col'>
-      <h3 className="text-white text-4xl mb-10 text-center">Card Details</h3>
+  return <div className='widget-container flex flex-col'>
+    <h3 className="text-white text-4xl mb-10 text-center">Sign Up</h3>
+    <div className="flex-1 flex flex-col items-center justify-center">
       <div>
-        <input
-          value={values.walletAddress}
-          disabled={!!checkoutRequestId}
-          onChange={(e) => setFieldValue('walletAddress', e.target.value)}
-          onBlur={onValidateWalletAddress}
-          className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-          placeholder="Wallet Address"
-        />
-        {touched.walletAddress && errors.walletAddress && <div className='text-red-400 text-[12px] text-left'>{errors.walletAddress}</div>}
         <div
           className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
@@ -111,6 +64,30 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
             {touched.lastName && errors.lastName && <div className='text-red-400 text-[12px] text-left'>{errors.lastName}</div>}
           </div>
         </div>
+        <div
+          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
+          <div className="flex-1">
+            <DatePicker
+              className="bg-transparent placeholder-white text-lg outline-none w-full"
+              selected={values.dob}
+              showMonthDropdown={true}
+              showYearDropdown={true}
+              placeholderText="Date of Birth"
+              openToDate={new Date("1993/09/28")}
+              onBlur={() => setFieldTouched('dob', true)}
+              onChange={(date) => setFieldValue('dob', date)}
+            />
+          </div>
+          <div className="flex-1">
+            <select
+              onBlur={() => setFieldTouched('gender', true)}
+              onChange={(e) => setFieldValue('gender', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Last Name">
+              <option selected={values.gender === 'male'} value="male">Male</option>
+              <option selected={values.gender === 'female'} value="female">Female</option>
+            </select>
+          </div>
+        </div>
         <div className="flex">
           <div className="flex-1">
             {touched.dob && !values.dob && <div className='text-red-400 text-[12px] text-left'>Date of Birth is required</div>}
@@ -120,15 +97,15 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
         </div>
       </div>
-      <div className="flex-1 flex flex-col justify-center mt-3">
+      <div className="flex-1 flex flex-col justify-center mt-3 w-full">
         <input
-          value={values.email}
-          onBlur={() => setFieldTouched('email', true)}
-          onChange={(e) => setFieldValue('email', e.target.value)}
-          className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-          placeholder="Email"
+          value={values.taxId}
+          onBlur={() => setFieldTouched('taxId', true)}
+          onChange={(e) => setFieldValue('taxId', e.target.value)}
+          className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
+          placeholder="Tax Number ID"
         />
-        {touched.email && errors.email && <div className='text-red-400 text-[12px] text-left'>{errors.email}</div>}
+        {touched.taxId && !values.taxId && <div className='text-red-400 text-[12px] text-left'>Tax Number ID is required</div>}
         <div className="flex mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
           <PhoneInput
             defaultCountry="US"
@@ -140,24 +117,25 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           />
         </div>
         {touched.phoneNumber && errors.phoneNumber && <div className='text-red-400 text-[12px] text-left'>{errors.phoneNumber}</div>}
+        <input
+          value={values.email}
+          onBlur={() => setFieldTouched('email', true)}
+          onChange={(e) => setFieldValue('email', e.target.value)}
+          className="text-white mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
+          placeholder="Email"
+        />
+        {touched.email && errors.email && <div className='text-red-400 text-[12px] text-left'>{errors.email}</div>}
+        <input
+          value={values.password}
+          onBlur={() => setFieldTouched('password', true)}
+          onChange={(e) => setFieldValue('password', e.target.value)}
+          className="text-white mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
+          placeholder="Password"
+          type="password"
+        />
+        {touched.password && !values.password && <div className='text-red-400 text-[12px] text-left'>Password is required</div>}
       </div>
       <div>
-        <Frames
-          ref={ref}
-          config={checkoutConfig}
-          cardTokenized={onGenerate}
-          frameValidationChanged={onFrameValidationChanged}
-          cardTokenizationFailed={onGenerateTokenFailed}
-        >
-          <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
-            <CardNumber />
-          </div>
-          <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
-            <ExpiryDate />
-            <Cvv />
-          </div>
-        </Frames>
-        {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
         <div className="mt-5 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
             <input
@@ -233,15 +211,17 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
         </div>
       </div>
-      <button
-        onClick={() => onSubmit()}
-        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid && !isLoading ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-      >
-        <div className="flex items-center">
-          {isLoading && <ClockLoader size={20} color='white' className="mr-2" />}
-          Submit Payment
-        </div>
-      </button>
+      <div className="text-white mt-5">
+        Have an account? <span className="cursor-pointer text-purple-600" onClick={() => setFieldValue('auth', 'login')}>Login</span>
+      </div>
     </div>
-  )
+    <button
+      onClick={() => isValid  && onNext()}
+      className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+    >
+      <div className="flex items-center">
+        Create Your Account
+      </div>
+    </button>
+  </div>
 }
