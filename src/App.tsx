@@ -10,6 +10,7 @@ import { apolloClient } from './services';
 import { ToastContainer } from 'react-toastify';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from './context/auth';
+import { Header } from './components/header';
 
 function App() {
   return (
@@ -17,10 +18,7 @@ function App() {
       <ApolloProvider client={apolloClient}>
         <AuthProvider>
           <div className="app flex flex-col">
-            <div className='header flex justify-end items-center pl-8 pr-8'>
-              <input className='bg-transparent h-8 outline-none text-white mr-3' placeholder='Search' />
-              <a className='text-white underline font-bold text-lg' href='https://jxndao.com/storefront' target="_blank">Storefront</a>
-            </div>
+            <Header />
             <div className='flex items-center justify-center w-full flex-1 overflow-auto py-10'>
               <Routes>
                 <Route path='/:checkoutRequestId' element={<Checkout />} />

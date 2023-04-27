@@ -3,7 +3,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
-  useMemo,
+  useState,
 } from 'react';
 import { GET_ME } from '../utils/graphql';
 import { axiosService } from '../axios/axiosService';
@@ -12,12 +12,14 @@ import { toast } from 'react-toastify';
 export interface AuthContextProps {
   user: any;
   onLogin: (email: string, password: string) => void;
+  onLogout: () => void;
   refreshUser: () => void;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   user: null,
   onLogin: () => {},
+  onLogout: () => {},
   refreshUser: () => {}
 });
 
@@ -30,9 +32,9 @@ export const useAuth = () => {
 export const AuthProvider = (props: {
   children: React.ReactChild[] | React.ReactChild;
 }) => {
-  const { data: userRes, refetch: refreshUser, error } = useQuery(GET_ME)
+  const { data: userRes, refetch: refreshUser, error, loading } = useQuery(GET_ME)
   
-  const user = useMemo(() => userRes?.me, [userRes])
+  const [user, setUser] = useState()
   const onLogin = async (email: string, password: string) => {
     try {
       const res: any = await axiosService.post('/login', {
@@ -47,6 +49,19 @@ export const AuthProvider = (props: {
     }
   }
 
+  const onLogout = () => {
+    localStorage.removeItem('auth_token')
+    refreshUser()
+  }
+
+  useEffect(() => {
+    if (error) {
+      setUser(undefined)
+    } else {
+      setUser(userRes?.me)
+    }
+  }, [userRes, error, loading])
+
   useEffect(() => {
     if (error?.message?.includes('Access denied!')) {
       localStorage.removeItem('auth_token')
@@ -58,6 +73,7 @@ export const AuthProvider = (props: {
       value={{
         user,
         onLogin,
+        onLogout,
         refreshUser
       }}>
       {props.children}

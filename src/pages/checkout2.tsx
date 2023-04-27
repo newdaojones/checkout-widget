@@ -182,7 +182,8 @@ export function Checkout() {
       taxId: '',
       gender: 'male',
       dob: undefined,
-      auth: 'login'
+      auth: 'login',
+      password: ''
     })
     setErrors({})
     setTouched({})
@@ -255,6 +256,7 @@ export function Checkout() {
     setFieldValue('state', user?.state || '')
     setFieldValue('zip', user?.zip || '')
     setFieldValue('country', user?.country || 'US')
+    setFieldValue('password', '')
   }, [user, setFieldValue])
 
   useEffect(() => {
