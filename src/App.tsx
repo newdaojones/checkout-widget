@@ -4,13 +4,14 @@ import './App.css';
 import "react-multi-carousel/lib/styles.css";
 import 'react-toastify/dist/ReactToastify.css';
 import "react-datepicker/dist/react-datepicker.css";
-import { Checkout } from './pages/checkout2';
+import { Checkout } from './pages/checkout';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './services';
 import { ToastContainer } from 'react-toastify';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from './context/auth';
 import { Header } from './components/header';
+import { PrimeTrustTerms } from './pages/primeTrustTerms';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Header />
             <div className='flex items-center justify-center w-full flex-1 overflow-auto py-10'>
               <Routes>
+                <Route path='/prime-trust/terms' element={<PrimeTrustTerms />} />
                 <Route path='/:checkoutRequestId' element={<Checkout />} />
                 <Route path='/' element={<Checkout />} />
               </Routes>

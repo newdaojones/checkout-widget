@@ -141,3 +141,7 @@ input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
 .react-datepicker__navigation-icon::before {
   top: 16px;
 }
+
+p.BasicParagraph, li.BasicParagraph, div.BasicParagraph, .pt__signature {
+  color: white !important;
+}

@@ -139,3 +139,9 @@ subscription UserVerify($userId: String!) {
     token
   }
 }`
+
+export const GET_PRIME_TRUST_AGREEMENT_PREVIEW = gql`
+  query agreementPreview($name: String!) {
+    agreementPreview(name: $name)
+  }
+`

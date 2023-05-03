@@ -66,7 +66,7 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
       <div className="mt-6 mb-2 text-left">
         <label className="text-white text-xs cursor-pointer select-none">
           <input className="checkbox" type="checkbox" checked={values.isConfirmedPurchase} onChange={(e) => setFieldValue('isConfirmedPurchase', e.target.checked)} />
-          By checking this box you acknowledge your intent to make a purchase using the <span className="text-pink-500">Visa</span> | <span className="text-pink-500">Mastercard</span> checkout method provided by <span className="text-blue-400">Storefront</span>
+          To complete your purchase using <span className="text-pink-500">Visa</span> or <span className="text-pink-500">Mastercard</span> checkout, please check the box to acknowledge your intent. You can view your customer rights by reviewing our <a onClick={(e) => e.stopPropagation()} className="text-purple-500 underline" href="https://www.mybackpack.app/terms-of-service" target="_blank">terms of service (TOS)</a> and <a onClick={(e) => e.stopPropagation()} className="text-purple-500 underline" href="https://www.mybackpack.app/privacy-policy" target="_blank">privacy policy (PP)</a>.
         </label>
         {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
       </div>

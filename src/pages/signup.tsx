@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CheckoutInfo } from "../types/checkout.type";
 import PhoneInput from 'react-phone-number-input'
 import DatePicker from "react-datepicker";
@@ -10,6 +10,7 @@ interface Props extends FormikProps<CheckoutInfo> {
 }
 
 export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTouched, setFieldValue, onNext }: Props) => {
+  const [isConfirmed, setIsConfirmed] = useState(false)
   const isValid = useMemo(() =>
     !errors.firstName &&
     !errors.lastName &&
@@ -32,8 +33,15 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
     values.streetAddress &&
     values.city &&
     values.state &&
-    values.zip
+    values.zip &&
+    isConfirmed
     , [values, errors])
+
+  useEffect(() => {
+    if (!values.firstName || !values.lastName) {
+      setIsConfirmed(false)
+    }
+  }, [values])
 
   return <div className='widget-container flex flex-col'>
     <h3 className="text-white text-4xl mb-10 text-center">Sign Up</h3>
@@ -215,8 +223,17 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
         Have an account? <span className="cursor-pointer text-purple-600" onClick={() => setFieldValue('auth', 'login')}>Login</span>
       </div>
     </div>
+    {values.firstName && values.lastName && (
+      <div className="mt-6 mb-2 text-left">
+        <label className="text-white text-xs cursor-pointer select-none">
+          <input className="checkbox" type="checkbox" checked={isConfirmed} onChange={() => setIsConfirmed(!isConfirmed)} />
+          Please check the box to acknowledge your intent. You can view our financial partner Prime Trust’s <a onClick={(e) => e.stopPropagation()} className="text-purple-500 underline" href={`prime-trust/terms?name=${values.firstName} ${values.lastName}`} target="_blank">terms and conditions</a>.
+        </label>
+        {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
+      </div>
+    )}
     <button
-      onClick={() => isValid  && onNext()}
+      onClick={() => isValid && onNext()}
       className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
     >
       <div className="flex items-center">
