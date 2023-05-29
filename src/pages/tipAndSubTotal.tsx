@@ -36,7 +36,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.1).toFixed(2) : ''}</p>
         <div
           className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '10' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          onClick={() => setFieldValue && setFieldValue('tipPercent', '10')}
+          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '10' ? '' : '10')}
         >
           10%
         </div>
@@ -45,7 +45,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.15).toFixed(2) : ''}</p>
         <div
           className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '15' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          onClick={() => setFieldValue && setFieldValue('tipPercent', '15')}
+          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '15' ? '' : '15')}
         >
           15%
         </div>
@@ -54,7 +54,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.2).toFixed(2) : ''}</p>
         <div
           className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '20' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          onClick={() => setFieldValue && setFieldValue('tipPercent', '20')}
+          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '20' ? '' : '20')}
         >
           20%
         </div>
