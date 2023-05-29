@@ -7,10 +7,10 @@ import ClockLoader from 'react-spinners/ClockLoader'
 import { checkoutConfig } from "../utils/checkout";
 import web3 from 'web3'
 interface Props extends FormikProps<CheckoutInfo> {
-  checkoutRequestId?: string;
+  checkoutRequest?: any;
 }
 
-export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequestId }: Props) => {
+export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const onFrameValidationChanged = (e: any) => {
@@ -79,7 +79,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
       <div>
         <input
           value={values.walletAddress}
-          disabled={!!checkoutRequestId}
+          disabled={!!checkoutRequest?.walletAddress}
           onChange={(e) => setFieldValue('walletAddress', e.target.value)}
           onBlur={onValidateWalletAddress}
           className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
@@ -123,6 +123,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
       <div className="flex-1 flex flex-col justify-center mt-3">
         <input
           value={values.email}
+          disabled={!!checkoutRequest?.email}
           onBlur={() => setFieldTouched('email', true)}
           onChange={(e) => setFieldValue('email', e.target.value)}
           className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
@@ -133,7 +134,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           <PhoneInput
             defaultCountry="US"
             placeholder="Phone"
-            disabled={!!checkoutRequestId}
+            disabled={!!checkoutRequest?.phoneNumber}
             onBlur={() => setFieldTouched('phoneNumber', true)}
             value={values.phoneNumber}
             onChange={(e) => setFieldValue('phoneNumber', e)}

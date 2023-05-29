@@ -17,10 +17,6 @@ import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import ClockLoader from 'react-spinners/ClockLoader'
 
-interface QueryParams {
-  checkoutRequestId: string;
-}
-
 export function Checkout() {
   const { user, refreshUser } = useAuth()
   const { checkoutRequestId } = useParams();
@@ -150,7 +146,7 @@ export function Checkout() {
     validationSchema: checkoutValidationSchema,
     onSubmit: onSubmitForm
   });
-  const { values, errors, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
+  const { values, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
 
   const onNext = (index: number, force = false) => {
     if (isDisabledSteps && !force) {
@@ -232,10 +228,10 @@ export function Checkout() {
 
   useEffect(() => {
     if (checkoutRequest) {
-      setFieldValue('cost', checkoutRequest.checkoutRequest.amount)
-      setFieldValue('walletAddress', checkoutRequest.checkoutRequest.walletAddress)
-      setFieldValue('phoneNumber', checkoutRequest.checkoutRequest.phoneNumber)
-      setFieldValue('email', checkoutRequest.checkoutRequest.email)
+      setFieldValue('cost', checkoutRequest.checkoutRequest.amount, false)
+      setFieldValue('walletAddress', checkoutRequest.checkoutRequest.walletAddress, false)
+      setFieldValue('phoneNumber', checkoutRequest.checkoutRequest.phoneNumber, false)
+      setFieldValue('email', checkoutRequest.checkoutRequest.email, false)
     }
   }, [checkoutRequest, setFieldValue])
 
@@ -246,17 +242,17 @@ export function Checkout() {
   }, [checkoutRequestError])
 
   useEffect(() => {
-    setFieldValue('firstName', user?.firstName || '')
-    setFieldValue('lastName', user?.lastName || '')
-    setFieldValue('email', user?.email || '')
-    setFieldValue('phoneNumber', user?.phoneNumber || '')
-    setFieldValue('streetAddress', user?.streetAddress || '')
-    setFieldValue('streetAddress2', user?.streetAddress2 || '')
-    setFieldValue('city', user?.city || '')
-    setFieldValue('state', user?.state || '')
-    setFieldValue('zip', user?.zip || '')
-    setFieldValue('country', user?.country || 'US')
-    setFieldValue('password', '')
+    setFieldValue('firstName', user?.firstName || '', false)
+    setFieldValue('lastName', user?.lastName || '', false)
+    setFieldValue('email', user?.email || '', false)
+    setFieldValue('phoneNumber', user?.phoneNumber || '', false)
+    setFieldValue('streetAddress', user?.streetAddress || '', false)
+    setFieldValue('streetAddress2', user?.streetAddress2 || '', false)
+    setFieldValue('city', user?.city || '', false)
+    setFieldValue('state', user?.state || '', false)
+    setFieldValue('zip', user?.zip || '', false)
+    setFieldValue('country', user?.country || 'US', false)
+    setFieldValue('password', '', false)
   }, [user, setFieldValue])
 
   useEffect(() => {
@@ -436,7 +432,7 @@ export function Checkout() {
           onNext={() => onNext(currentStep + 1)}
         />}
         <CardDetails
-          checkoutRequestId={checkoutRequestId}
+          checkoutRequest={checkoutRequest?.checkoutRequest}
           {...checkoutInfo}
         />
         <TransactionDetails
