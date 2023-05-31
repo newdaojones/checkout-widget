@@ -78,6 +78,42 @@ export const CREATE_ACCOUNT = gql`
   }
 `;
 
+export const GET_CHECKOUT = gql`
+  query Checkout($id: String!) {
+    checkout(id: $id) {
+      id
+      walletAddress
+      firstName
+      lastName
+      email
+      phoneNumber
+      currency
+      amount
+      fee
+      feeType
+      tip
+      tipType
+      streetAddress
+      streetAddress2
+      city
+      state
+      zip
+      country
+      createdAt
+      updatedAt
+      transaction {
+        checkoutId
+        step
+        status
+        paidStatus
+        message
+        transactionId
+        date
+      }
+    }
+  }
+`
+
 export const GET_CHECKOUT_REQUEST = gql`
   query CheckoutRequest($id: String!) {
     checkoutRequest(id: $id) {

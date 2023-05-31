@@ -6,7 +6,7 @@ import { TransactionDetails } from './transactionDetails';
 import { CheckoutInfo } from '../types/checkout.type';
 import Carousel from 'react-multi-carousel'
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { ACCOUNT_VERIFY, CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import { ACCOUNT_VERIFY, CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
@@ -16,6 +16,9 @@ import { Login } from './login';
 import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import ClockLoader from 'react-spinners/ClockLoader'
+import { useWindowFocus } from '../uses/useWindowFocus';
+
+const CHECKOUT_STORAGE_ID = 'CHECKOUT/CHECKOUT_STORAGE_ID'
 
 export function Checkout() {
   const { user, refreshUser } = useAuth()
@@ -26,36 +29,43 @@ export function Checkout() {
   const devicer = (window as any).devicer
   const Socure = (window as any).Socure
   const [isSocureProcess, setIsSocureProcess] = useState(false)
-
+  const [storedCheckoutId] = useState<string | null>(localStorage.getItem(CHECKOUT_STORAGE_ID))
+  const carousel = useRef<any>()
+  const [currentStep, setCurrentStep] = useState(0)
+  const [deviceId, setDeviceId] = useState<string>()
+  const [documentId, setDocumentId] = useState<string>()
+  const [isVerifying, setIsVerifing] = useState(false)
+  const [checkout, setCheckout] = useState<any>()
+  const [transaction, setTransaction] = useState<any>();
+  const { isWindowFocused } = useWindowFocus()
   const { data: checkoutRequest, error: checkoutRequestError } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
       id: checkoutRequestId
     },
     skip: !checkoutRequestId
   })
-
-  const carousel = useRef<any>()
-  const [currentStep, setCurrentStep] = useState(0)
-  const [deviceId, setDeviceId] = useState<string>()
-  const [documentId, setDocumentId] = useState<string>()
-  const [isVerifying, setIsVerifing] = useState(false)
-
   const [createCheckout, { data: checkoutResponse, loading: loadingCheckout, error: errorCheckout, reset: resetCheckout }] = useMutation(CREATE_CHECKOUT);
   const [createCheckoutWithoutUser, { data: checkoutWithoutUserRes, loading: loadingCheckoutWithout, error: errorCheckoutWithoutUser, reset: resetCheckoutWithoutUser }] = useMutation(CREATE_CHECKOUT_WITHOUT_USER);
   const [createAccount, { data: createAccountResponse, loading: loadingCreateAccount, error: createAccountError, reset: resetCreateAccount }] = useMutation(CREATE_ACCOUNT)
+  const { data: checkoutData, refetch: refetchCheckout } = useQuery(GET_CHECKOUT, {
+    variables: {
+      id: storedCheckoutId
+    },
+    skip: !storedCheckoutId
+  })
 
   const userId = useMemo(() => createAccountResponse?.createUser?.id, [createAccountResponse])
   const checkoutError = useMemo(() => errorCheckout || errorCheckoutWithoutUser, [errorCheckout, errorCheckoutWithoutUser])
-  const checkout = useMemo(() => checkoutResponse?.createCheckout || checkoutWithoutUserRes?.createCheckoutWithoutUser, [checkoutResponse, checkoutWithoutUserRes])
   const checkoutId = useMemo(() => checkout?.id, [checkout])
   const checkoutLoading = useMemo(() => loadingCheckout || loadingCheckoutWithout, [loadingCheckout, loadingCheckoutWithout])
   const isFinalStep = useMemo(() => user ? currentStep === 3 : currentStep === 4, [user, currentStep])
   const isDisabledSteps = useMemo(() => isFinalStep || isVerifying, [isFinalStep, isVerifying])
   const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
     variables: {
-      checkoutId
+      checkoutId,
     },
-    skip: !checkoutId
+    shouldResubscribe: isWindowFocused,
+    skip: !checkoutId || !isWindowFocused
   })
   const { data: userVerify, error: userVerifyError } = useSubscription(ACCOUNT_VERIFY, {
     variables: {
@@ -63,8 +73,6 @@ export function Checkout() {
     },
     skip: !userId
   })
-
-  const transaction = useMemo(() => transactionResponse?.transaction, [transactionResponse])
 
   const onSubmitForm = (data: CheckoutInfo) => {
     if (user) {
@@ -186,6 +194,8 @@ export function Checkout() {
     resetCheckout()
     resetCheckoutWithoutUser()
     resetCreateAccount()
+    setTransaction(null)
+    localStorage.removeItem(CHECKOUT_STORAGE_ID)
     navigate('/')
     onNext(0, true)
   }
@@ -254,6 +264,27 @@ export function Checkout() {
     setFieldValue('country', user?.country || 'US', false)
     setFieldValue('password', '', false)
   }, [user, setFieldValue])
+
+  useEffect(() => {
+    if (checkoutData?.checkout) {
+      setFieldValue('firstName', checkoutData?.checkout.firstName || '', false)
+      setFieldValue('lastName', checkoutData?.checkout.lastName || '', false)
+      setFieldValue('email', checkoutData?.checkout.email || '', false)
+      setFieldValue('phoneNumber', checkoutData?.checkout.phoneNumber || '', false)
+      setFieldValue('streetAddress', checkoutData?.checkout.streetAddress || '', false)
+      setFieldValue('streetAddress2', checkoutData?.checkout.streetAddress2 || '', false)
+      setFieldValue('city', checkoutData?.checkout.city || '', false)
+      setFieldValue('state', checkoutData?.checkout.state || '', false)
+      setFieldValue('zip', checkoutData?.checkout.zip || '', false)
+      setFieldValue('country', checkoutData?.checkout.country || 'US', false)
+      setFieldValue('cost', checkoutData?.checkout.amount, false)
+      setFieldValue('tipPercent', checkoutData?.checkout.tip, false)
+
+      if (checkoutData.checkout.transaction) {
+        setTransaction(checkoutData.checkout.transaction)
+      }
+    }
+  }, [checkoutData, setFieldValue])
 
   useEffect(() => {
     if (createAccountError) {
@@ -362,6 +393,36 @@ export function Checkout() {
     }
   }, [isSocureProcess])
 
+  useEffect(() => {
+    if (checkout) {
+      localStorage.setItem(CHECKOUT_STORAGE_ID, checkout.id)
+    } else {
+      localStorage.removeItem(CHECKOUT_STORAGE_ID)
+    }
+  }, [checkout])
+
+  useEffect(() => {
+    setCheckout(checkoutResponse?.createCheckout)
+  }, [checkoutResponse])
+
+  useEffect(() => {
+    setCheckout(checkoutWithoutUserRes?.createCheckoutWithoutUser)
+  }, [checkoutWithoutUserRes])
+
+  useEffect(() => {
+    setCheckout(checkoutData?.checkout)
+  }, [checkoutData])
+
+  useEffect(() => {
+    setTransaction(transactionResponse?.transaction)
+  }, [transactionResponse])
+
+  useEffect(() => {
+    if (isWindowFocused) {
+      refetchCheckout()
+    }
+  }, [isWindowFocused])
+
   return (
     <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
       <Carousel
@@ -436,7 +497,7 @@ export function Checkout() {
           {...checkoutInfo}
         />
         <TransactionDetails
-          transaction={transactionResponse?.transaction}
+          transaction={transaction}
           checkoutInfo={values}
           onNext={() => onResetForm()}
         />
