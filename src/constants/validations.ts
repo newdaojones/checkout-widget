@@ -41,6 +41,6 @@ export const checkoutValidationSchema = yup.object().shape({
   isValidCard: yup.boolean().isTrue('The card info is invalid'),
   cost: yup.number().required('The cost is required').positive().min(1, 'The cost must be greater than $1'),
   tipPercent: yup.number().positive('The tip amount must be positive'),
-  paymentMethod: yup.string().required('The payment method is required'),
+  feeMethod: yup.number().positive('Payment fee method is required'),
   isConfirmedPurchase: yup.boolean().isTrue('Please confirm for purchasing')
 })

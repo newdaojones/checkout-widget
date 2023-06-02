@@ -75,6 +75,7 @@ export function Checkout() {
   })
 
   const onSubmitForm = (data: CheckoutInfo) => {
+    console.log(data)
     if (user) {
       createCheckout({
         variables: {
@@ -87,8 +88,7 @@ export function Checkout() {
             amount: Number(data.cost),
             tip: data.tipPercent ? Number(data.tipPercent) : 0,
             tipType: 'percent',
-            fee: 0,
-            feeType: 'percent',
+            feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
             city: data.city,
@@ -112,8 +112,7 @@ export function Checkout() {
             amount: Number(data.cost),
             tip: data.tipPercent ? Number(data.tipPercent) : 0,
             tipType: 'percent',
-            fee: 0,
-            feeType: 'percent',
+            feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
             city: data.city,
@@ -132,7 +131,7 @@ export function Checkout() {
     initialValues: {
       cost: '',
       tipPercent: '',
-      paymentMethod: '',
+      feeMethod: 0,
       firstName: '',
       lastName: '',
       email: '',
@@ -156,7 +155,9 @@ export function Checkout() {
     validationSchema: checkoutValidationSchema,
     onSubmit: onSubmitForm
   });
-  const { values, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
+  const { values, errors, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
+
+  console.log(errors)
 
   const onNext = (index: number, force = false) => {
     if (isDisabledSteps && !force) {
@@ -166,11 +167,16 @@ export function Checkout() {
     carousel.current.goToSlide(index)
   }
 
+  useEffect(() => {
+    setFieldValue('userEmail', values.email)
+    setFieldValue('userPhoneNumber', values.phoneNumber)
+  }, [values, setFieldValue])
+
   const onResetForm = () => {
     setValues({
       cost: '',
       tipPercent: '',
-      paymentMethod: '',
+      feeMethod: 0,
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
       email: checkoutRequest ? checkoutRequest.checkoutRequest?.email : user?.email || '',

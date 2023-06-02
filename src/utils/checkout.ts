@@ -1,5 +1,5 @@
 export const checkoutConfig = {
-  debug: false,
+  debug: true,
   publicKey: process.env.REACT_APP_CHECKOUT_PUBLIC_KEY as string,
   style: {
     base: {

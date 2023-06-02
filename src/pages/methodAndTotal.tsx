@@ -13,10 +13,11 @@ interface Props extends FormikProps<CheckoutInfo> {
 export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
   const { user } = useAuth();
   const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
-  // const total = useMemo(() => costWithTip + (values.cost && values.paymentMethod ? Number(values.cost) * Number(2) / 100 : 0), [costWithTip, values])
+  const fee = useMemo(() => Number((costWithTip * 0.06).toFixed(2)), [costWithTip])
+  const total = useMemo(() => costWithTip + fee, [costWithTip, fee])
 
   const isValid = useMemo(() =>
-    !errors.paymentMethod &&
+    !errors.feeMethod &&
     !errors.isConfirmedPurchase,
     [errors])
 
@@ -36,27 +37,33 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
       <div className="flex-1 flex flex-col justify-center">
         <p className="text-white text-lg text-left mb-2">+ Payment Fee</p>
         <div className="flex items-center justify-around">
-          <button
-            onClick={() => setFieldValue('paymentMethod', 'card')}
-            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.paymentMethod === 'card' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-          >
-            <img src={VisaIcon} alt='' className="!w-8" />
-          </button>
+          <div>
+            <button
+              onClick={() => setFieldValue('feeMethod', 1)}
+              className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+            >
+              <img src={VisaIcon} alt='' className="!w-8" />
+            </button>
+            <div className="text-sm text-center text-white mt-1">${fee.toFixed(2)}</div>
+          </div>
           <p className="text-white text-lg">OR</p>
-          <button
-            disabled
-            className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.paymentMethod === 'usdc' ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-            onClick={() => setFieldValue('paymentMethod', 'usdc')}
-          >
-            <img src={UsdcIcon} alt='' className="!w-6" />
-          </button>
+          <div>
+            <button
+              disabled
+              className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+              onClick={() => setFieldValue('feeMethod', 2)}
+            >
+              <img src={UsdcIcon} alt='' className="!w-6" />
+            </button>
+            <div className="text-sm text-center text-white mt-1">{fee.toFixed(2)}</div>
+          </div>
         </div>
-        {touched.paymentMethod && errors.paymentMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.paymentMethod}</div>}
+        {touched.feeMethod && errors.feeMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.feeMethod}</div>}
       </div>
       <p className="mt-2 text-white text-lg text-left">= Total</p>
       <div className="flex w-full">
         <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-          {costWithTip.toFixed(2)}
+          {total.toFixed(2)}
         </div>
         <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
           <img src={UsFlagImage} alt='' className="flag mr-2" />

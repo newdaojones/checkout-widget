@@ -1,7 +1,7 @@
 export interface CheckoutInfo {
     cost: string,
     tipPercent: string,
-    paymentMethod: string,
+    feeMethod: number,
     firstName: string,
     lastName: string,
     email: string,

@@ -13,6 +13,7 @@ export const CREATE_CHECKOUT = gql`
       amount
       fee
       feeType
+      feeMethod
       tip
       tipType
       streetAddress
@@ -40,6 +41,7 @@ export const CREATE_CHECKOUT_WITHOUT_USER = gql`
       amount
       fee
       feeType
+      feeMethod
       tip
       tipType
       streetAddress
@@ -91,6 +93,7 @@ export const GET_CHECKOUT = gql`
       amount
       fee
       feeType
+      feeMethod
       tip
       tipType
       streetAddress

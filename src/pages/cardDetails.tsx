@@ -28,6 +28,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   const onGenerateTokenFailed = (e: any) => {
+    console.log(e)
     Frames.init(checkoutConfig)
     setFieldValue('isValidCard', false)
     setFieldValue('token', '')
@@ -35,6 +36,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   const onGenerate = (e: any) => {
+    console.log(e)
     setFieldValue('token', e.token);
   }
 
