@@ -167,11 +167,6 @@ export function Checkout() {
     carousel.current.goToSlide(index)
   }
 
-  useEffect(() => {
-    setFieldValue('userEmail', values.email)
-    setFieldValue('userPhoneNumber', values.phoneNumber)
-  }, [values, setFieldValue])
-
   const onResetForm = () => {
     setValues({
       cost: '',

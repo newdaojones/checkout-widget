@@ -84,6 +84,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           value={values.walletAddress}
           autoComplete="off"
           disabled={!!checkoutRequest?.walletAddress}
+          name={checkoutRequest?.walletAddress ? 'walletAddress_off' : 'walletAddress'}
           onChange={(e) => setFieldValue('walletAddress', e.target.value)}
           onBlur={onValidateWalletAddress}
           className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
@@ -131,6 +132,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           onBlur={() => setFieldTouched('email', true)}
           onChange={(e) => setFieldValue('email', e.target.value)}
           autoComplete="off"
+          name={checkoutRequest?.email ? 'email_off' : 'email'}
           className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
           placeholder="Email"
         />
@@ -140,6 +142,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
             defaultCountry="US"
             placeholder="Phone"
             autoComplete="off"
+            name={checkoutRequest?.phoneNumber ? 'phoneNumber_off' : 'phoneNumber'}
             disabled={!!checkoutRequest?.phoneNumber}
             onBlur={() => setFieldTouched('phoneNumber', true)}
             value={values.phoneNumber}

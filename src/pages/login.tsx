@@ -53,7 +53,6 @@ export const Login = ({
           <input
             value={values.userEmail}
             type="email"
-            autoComplete="off"
             onBlur={() => setFieldTouched("userEmail", true)}
             onChange={(e) => setFieldValue("userEmail", e.target.value)}
             className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
@@ -71,7 +70,6 @@ export const Login = ({
             onBlur={() => setFieldTouched("password", true)}
             onChange={(e) => setFieldValue("password", e.target.value)}
             className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-            type="password"
             placeholder="Password"
           />
           {touched.password && !values.password && (
