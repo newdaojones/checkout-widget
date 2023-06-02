@@ -19,7 +19,7 @@ export const Login = ({
     () =>
       values.cost
         ? Number(values.cost) +
-          (Number(values.cost) * Number(values.tipPercent || 0)) / 100
+        (Number(values.cost) * Number(values.tipPercent || 0)) / 100
         : 0,
     [values]
   );
@@ -52,6 +52,8 @@ export const Login = ({
         <div className="flex flex-col justify-center w-full">
           <input
             value={values.email}
+            type="email"
+            autoComplete="off"
             onBlur={() => setFieldTouched("email", true)}
             onChange={(e) => setFieldValue("email", e.target.value)}
             className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
@@ -107,9 +109,8 @@ export const Login = ({
       )}
       <button
         onClick={() => onSubmit()}
-        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${
-          isValid ? "bg-gradient-to-b from-purple-400 to-purple-600" : ""
-        }`}
+        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? "bg-gradient-to-b from-purple-400 to-purple-600" : ""
+          }`}
       >
         <div className="flex items-center">Login</div>
       </button>

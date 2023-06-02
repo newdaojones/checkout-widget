@@ -19,6 +19,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
       <input
         value={values.cost}
         placeholder={'0.00'}
+        autoComplete="off"
         disabled={!!checkoutRequestId}
         onBlur={() => setFieldTouched('cost', true)}
         onChange={(e) => setFieldValue && setFieldValue('cost', e.target.value)}
