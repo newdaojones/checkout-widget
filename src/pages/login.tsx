@@ -26,7 +26,7 @@ export const Login = ({
   const isRequiredLogin = useMemo(() => totalAmount >= 500, [totalAmount]);
 
   const isValid = useMemo(
-    () => !errors.email && !errors.password && values.email && values.password,
+    () => !errors.userEmail && !errors.password && values.userEmail && values.password,
     [values, errors]
   );
 
@@ -37,7 +37,7 @@ export const Login = ({
       return;
     }
 
-    onLogin(values.email, values.password as string);
+    onLogin(values.userEmail, values.password as string);
   };
 
   return (
@@ -51,17 +51,17 @@ export const Login = ({
         )}
         <div className="flex flex-col justify-center w-full">
           <input
-            value={values.email}
+            value={values.userEmail}
             type="email"
             autoComplete="off"
-            onBlur={() => setFieldTouched("email", true)}
-            onChange={(e) => setFieldValue("email", e.target.value)}
+            onBlur={() => setFieldTouched("userEmail", true)}
+            onChange={(e) => setFieldValue("userEmail", e.target.value)}
             className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
             placeholder="Email"
           />
-          {touched.email && errors.email && (
+          {touched.userEmail && errors.userEmail && (
             <div className="text-red-400 text-[12px] text-left">
-              {errors.email}
+              {errors.userEmail}
             </div>
           )}
         </div>

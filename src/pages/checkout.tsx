@@ -147,7 +147,9 @@ export function Checkout() {
       isConfirmedPurchase: false,
       walletAddress: '',
       token: '',
-      auth: 'login'
+      auth: 'login',
+      userEmail: '',
+      userPhoneNumber: ''
     },
     validateOnBlur: true,
     validateOnChange: true,
@@ -171,8 +173,8 @@ export function Checkout() {
       paymentMethod: '',
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
-      email: user?.email || '',
-      phoneNumber: user?.phoneNumber || '',
+      email: checkoutRequest ? checkoutRequest.checkoutRequest?.email : user?.email || '',
+      phoneNumber: checkoutRequest ? checkoutRequest.checkoutRequest?.phoneNumber : user?.phoneNumber || '',
       streetAddress: user?.streetAddress || '',
       streetAddress2: user?.streetAddress2 || '',
       city: user?.city || '',
@@ -187,7 +189,9 @@ export function Checkout() {
       gender: 'male',
       dob: undefined,
       auth: 'login',
-      password: ''
+      password: '',
+      userEmail: '',
+      userPhoneNumber: ''
     })
     setErrors({})
     setTouched({})
@@ -254,8 +258,12 @@ export function Checkout() {
   useEffect(() => {
     setFieldValue('firstName', user?.firstName || '', false)
     setFieldValue('lastName', user?.lastName || '', false)
-    setFieldValue('email', user?.email || '', false)
-    setFieldValue('phoneNumber', user?.phoneNumber || '', false)
+    if (!checkoutRequest?.checkoutRequest?.email) {
+      setFieldValue('email', user?.email || '', false)
+    }
+    if (!checkoutRequest?.checkoutRequest?.phoneNumber) {
+      setFieldValue('phoneNumber', user?.phoneNumber || '', false)
+    }
     setFieldValue('streetAddress', user?.streetAddress || '', false)
     setFieldValue('streetAddress2', user?.streetAddress2 || '', false)
     setFieldValue('city', user?.city || '', false)
@@ -263,7 +271,7 @@ export function Checkout() {
     setFieldValue('zip', user?.zip || '', false)
     setFieldValue('country', user?.country || 'US', false)
     setFieldValue('password', '', false)
-  }, [user, setFieldValue])
+  }, [checkoutRequest, user, setFieldValue])
 
   useEffect(() => {
     if (checkoutData?.checkout) {

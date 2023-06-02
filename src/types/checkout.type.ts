@@ -21,4 +21,6 @@ export interface CheckoutInfo {
     dob?: Date,
     gender?: string
     taxId?: string
+    userEmail: string
+    userPhoneNumber: string
 }

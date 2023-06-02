@@ -16,8 +16,8 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
     !errors.firstName &&
     !errors.lastName &&
     !errors.dob &&
-    !errors.email &&
-    !errors.phoneNumber &&
+    !errors.userEmail &&
+    !errors.userPhoneNumber &&
     !errors.taxId &&
     !errors.password &&
     !errors.streetAddress &&
@@ -27,8 +27,8 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
     values.firstName &&
     values.lastName &&
     values.dob &&
-    values.email &&
-    values.phoneNumber &&
+    values.userEmail &&
+    values.userPhoneNumber &&
     values.taxId &&
     values.password &&
     values.streetAddress &&
@@ -89,11 +89,13 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
           </div>
           <div className="flex-1">
             <select
+              value={values.gender}
+              defaultValue="male"
               onBlur={() => setFieldTouched('gender', true)}
               onChange={(e) => setFieldValue('gender', e.target.value)}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Last Name">
-              <option selected={values.gender === 'male'} value="male">Male</option>
-              <option selected={values.gender === 'female'} value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
             </select>
           </div>
         </div>
@@ -120,20 +122,20 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
             defaultCountry="US"
             placeholder="Phone"
             disabled={!!checkoutRequestId}
-            onBlur={() => setFieldTouched('phoneNumber', true)}
-            value={values.phoneNumber}
-            onChange={(e) => setFieldValue('phoneNumber', e)}
+            onBlur={() => setFieldTouched('userPhoneNumber', true)}
+            value={values.userPhoneNumber}
+            onChange={(e) => setFieldValue('userPhoneNumber', e)}
           />
         </div>
-        {touched.phoneNumber && errors.phoneNumber && <div className='text-red-400 text-[12px] text-left'>{errors.phoneNumber}</div>}
+        {touched.userPhoneNumber && errors.userPhoneNumber && <div className='text-red-400 text-[12px] text-left'>{errors.userPhoneNumber}</div>}
         <input
-          value={values.email}
-          onBlur={() => setFieldTouched('email', true)}
-          onChange={(e) => setFieldValue('email', e.target.value)}
+          value={values.userEmail}
+          onBlur={() => setFieldTouched('userEmail', true)}
+          onChange={(e) => setFieldValue('userEmail', e.target.value)}
           className="text-white mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
           placeholder="Email"
         />
-        {touched.email && errors.email && <div className='text-red-400 text-[12px] text-left'>{errors.email}</div>}
+        {touched.userEmail && errors.userEmail && <div className='text-red-400 text-[12px] text-left'>{errors.userEmail}</div>}
         <input
           value={values.password}
           onBlur={() => setFieldTouched('password', true)}
@@ -174,12 +176,13 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
           className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
             <select
+              value={values.state}
               onBlur={() => setFieldTouched('state', true)}
               onChange={(e) => setFieldValue('state', e.target.value)}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State"
             >
               <option value="">State</option>
-              {stateList.map((state) => <option key={state.value} value={state.value} selected={state.value === values.state}>{state.label}</option>)}
+              {stateList.map((state) => <option key={state.value} value={state.value} >{state.label}</option>)}
             </select>
           </div>
           <div className="flex-1">

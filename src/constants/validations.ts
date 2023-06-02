@@ -30,6 +30,8 @@ export const checkoutValidationSchema = yup.object().shape({
   lastName: yup.string().required('Last Name is required'),
   email: yup.string().required('Email is required').email('Email is invalid'),
   phoneNumber: yup.string().required('Phone Number is required'),
+  userEmail: yup.string().required('Email is required').email('Email is invalid'),
+  userPhoneNumber: yup.string().required('Phone Number is required'),
   country: yup.string().optional(),
   zip: yup.string().required('Zip Code is required'),
   state: yup.string().required('State is required'),
