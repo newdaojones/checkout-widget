@@ -6,6 +6,7 @@ import PhoneInput from 'react-phone-number-input'
 import ClockLoader from 'react-spinners/ClockLoader'
 import { checkoutConfig } from "../utils/checkout";
 import web3 from 'web3'
+import { stateList } from "../constants/state";
 interface Props extends FormikProps<CheckoutInfo> {
   checkoutRequest?: any;
 }
@@ -190,11 +191,14 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
         <div
           className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
-            <input
-              value={values.state}
+            <select
               onBlur={() => setFieldTouched('state', true)}
               onChange={(e) => setFieldValue('state', e.target.value)}
-              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State" />
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State"
+            >
+              <option value="">State</option>
+              {stateList.map((state) => <option key={state.value} value={state.value} selected={state.value === values.state}>{state.label}</option>)}
+            </select>
           </div>
           <div className="flex-1">
             <input
