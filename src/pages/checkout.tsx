@@ -324,8 +324,8 @@ export function Checkout() {
         data: {
           firstName: values.firstName,
           lastName: values.lastName,
-          email: values.email,
-          phoneNumber: values.phoneNumber,
+          email: values.userEmail,
+          phoneNumber: values.userPhoneNumber,
           password: values.password,
           gender: values.gender || 'male',
           dob: values.dob,
