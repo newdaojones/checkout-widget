@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { TipAndSubTotal } from './tipAndSubTotal';
-import { MethodAndTotal } from './methodAndTotal';
-import { CardDetails } from './cardDetails';
-import { TransactionDetails } from './transactionDetails';
-import { CheckoutInfo } from '../types/checkout.type';
-import Carousel from 'react-multi-carousel'
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { ACCOUNT_VERIFY, CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import { useFormik } from 'formik';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Carousel from 'react-multi-carousel';
+import { useNavigate, useParams } from 'react-router-dom';
+import ClockLoader from 'react-spinners/ClockLoader';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
-import { useFormik } from 'formik';
 import { checkoutValidationSchema } from '../constants/validations';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Login } from './login';
-import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
-import ClockLoader from 'react-spinners/ClockLoader'
+import { CheckoutInfo } from '../types/checkout.type';
 import { useWindowFocus } from '../uses/useWindowFocus';
+import { ACCOUNT_VERIFY, CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import { CardDetails } from './cardDetails';
+import { Login } from './login';
+import { MethodAndTotal } from './methodAndTotal';
+import { SignUp } from './signup';
+import { TipAndSubTotal } from './tipAndSubTotal';
+import { TransactionDetails } from './transactionDetails';
 
 const CHECKOUT_STORAGE_ID = 'CHECKOUT/CHECKOUT_STORAGE_ID'
 
@@ -142,6 +142,7 @@ export function Checkout() {
       state: '',
       zip: '',
       country: 'US',
+      cvv: '',
       isValidCard: false,
       isConfirmedPurchase: false,
       walletAddress: '',
@@ -182,6 +183,7 @@ export function Checkout() {
       state: user?.state || '',
       zip: user?.zip || '',
       country: user?.country || 'US',
+      cvv: '',
       isValidCard: false,
       isConfirmedPurchase: false,
       walletAddress: '',

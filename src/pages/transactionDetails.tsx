@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import UsFlagImage from '../assets/images/us-flag.png'
-import VisaIcon from '../assets/images/visa-icon.png'
-import { CheckoutInfo } from "../types/checkout.type";
-import moment from 'moment-timezone'
+import _ from 'lodash';
+import moment from 'moment-timezone';
+import { useEffect, useState } from "react";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import ClockLoader from 'react-spinners/ClockLoader'
+import ClockLoader from 'react-spinners/ClockLoader';
 import { toast } from "react-toastify";
-import _ from 'lodash'
+import UsFlagImage from '../assets/images/us-flag.png';
+import VisaIcon from '../assets/images/visa-icon.png';
+import { CheckoutInfo } from "../types/checkout.type";
 export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
   transaction?: any,
   checkoutInfo: CheckoutInfo,
@@ -82,7 +82,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
         <div className="mt-6 mb-2 text-left">
           <label className="text-white text-xs cursor-pointer select-none">
             <input className="checkbox" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
-            Check this box after you confirm that a copy of this receipt has been sent to your inbox
+            You can safely close this window, network confirmation can take up to 5 minutes at which point you will be emailed a receipt.
           </label>
         </div>
       )}

@@ -1,20 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { CheckoutInfo } from "../types/checkout.type";
-import { Frames, CardNumber, ExpiryDate, Cvv } from 'frames-react';
 import { FormikProps } from 'formik';
-import PhoneInput from 'react-phone-number-input'
-import ClockLoader from 'react-spinners/ClockLoader'
-import { checkoutConfig } from "../utils/checkout";
-import web3 from 'web3'
+import { CardNumber, Cvv, ExpiryDate, Frames } from 'frames-react';
+import { useEffect, useMemo, useRef, useState } from "react";
+import PhoneInput from 'react-phone-number-input';
+import ClockLoader from 'react-spinners/ClockLoader';
+import web3 from 'web3';
 import { stateList } from "../constants/state";
+import { CheckoutInfo } from "../types/checkout.type";
+import { checkoutConfig } from "../utils/checkout";
 interface Props extends FormikProps<CheckoutInfo> {
   checkoutRequest?: any;
 }
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [cvvError, setCvvError] = useState(false);
 
   const onFrameValidationChanged = (e: any) => {
+
+    // if (e.valid) {
+    //   setCvvError(true);
+    // } else {
+    //   setCvvError(false);
+    // }
+
     setFieldTouched('isValidCard', true, false)
     setFieldValue('isValidCard', e.isValid)
   }
@@ -26,6 +34,14 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
       setFieldError('walletAddress', 'Wallet Address is invalid')
     }
   }
+
+  const onValidateCvv = () => {
+    if (values.cvv && values.cvv.length < 3) {
+      setFieldTouched('cvv', true, false)
+      setFieldError('cvv', 'CVV is invalid')
+    }
+  }
+
 
   const onGenerateTokenFailed = (e: any) => {
     console.log(e)
@@ -48,17 +64,18 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }, [values, submitForm, isLoading])
 
   const isValid = useMemo(() =>
+    !errors.walletAddress &&
     !errors.firstName &&
     !errors.lastName &&
-    !errors.walletAddress &&
     !errors.email &&
-    !errors.phoneNumber &&
     !errors.country &&
+    !errors.phoneNumber &&
     !errors.zip &&
     !errors.state &&
     !errors.city &&
     !errors.streetAddress &&
     !errors.streetAddress2 &&
+    !errors.cvv &&
     !errors.isValidCard, [errors, values])
 
   const onSubmit = () => {
@@ -69,6 +86,12 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     if (values.walletAddress && !web3.utils.isAddress(values.walletAddress)) {
       setFieldTouched('walletAddress', true, false)
       setFieldError('walletAddress', 'Wallet address is invalid')
+      return
+    }
+
+    if (values.cvv && values.cvv.length < 3) {
+      setFieldTouched('cvv', true, false)
+      setFieldError('cvv', 'CVV is invalid')
       return
     }
 
@@ -164,7 +187,10 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
           <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
             <ExpiryDate />
-            <Cvv />
+            <Cvv
+              onBlur={() => setFieldTouched('cvv', true)}
+              onChange={(e) => setFieldValue('cvv', e)} />
+            {touched.cvv && errors.cvv && <div className='text-red-400 text-[12px] text-left'>{errors.cvv}</div>}
           </div>
         </Frames>
         {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
@@ -203,14 +229,19 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State"
             >
               <option value="">State</option>
-              {stateList.map((state) => <option key={state.value} value={state.value}>{state.label}</option>)}
+              {stateList.map((state) => <option key={state.value} value={state.value}>{state.value}</option>)}
             </select>
           </div>
           <div className="flex-1">
             <input
               value={values.city}
               onBlur={() => setFieldTouched('city', true)}
-              onChange={(e) => setFieldValue('city', e.target.value)}
+              onChange={(e) => {
+                let cityName = e.target.value;
+                cityName = cityName.replace(/[^a-zA-Z]/g, '');
+                cityName = cityName.charAt(0).toUpperCase() + cityName.slice(1).toLowerCase();
+                setFieldValue('city', cityName);
+              }}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="City" />
           </div>
         </div>

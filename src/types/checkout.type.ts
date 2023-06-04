@@ -23,4 +23,5 @@ export interface CheckoutInfo {
     taxId?: string
     userEmail: string
     userPhoneNumber: string
+    cvv: string
 }
