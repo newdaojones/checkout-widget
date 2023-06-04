@@ -22,7 +22,6 @@
   },
   "include": [
     "src",
-    "tipAndSubTotal2.tsx",
     "src/pages/tipAndSubTotal.tsx"
   ]
 }
