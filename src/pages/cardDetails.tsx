@@ -13,16 +13,8 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [cvvError, setCvvError] = useState(false);
 
-  const onFrameValidationChanged = (e: any) => {
-
-    // if (e.valid) {
-    //   setCvvError(true);
-    // } else {
-    //   setCvvError(false);
-    // }
-
+  const onCardValidationChanged = (e: any) => {
     setFieldTouched('isValidCard', true, false)
     setFieldValue('isValidCard', e.isValid)
   }
@@ -34,14 +26,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
       setFieldError('walletAddress', 'Wallet Address is invalid')
     }
   }
-
-  const onValidateCvv = () => {
-    if (values.cvv && values.cvv.length < 3) {
-      setFieldTouched('cvv', true, false)
-      setFieldError('cvv', 'CVV is invalid')
-    }
-  }
-
 
   const onGenerateTokenFailed = (e: any) => {
     console.log(e)
@@ -75,7 +59,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     !errors.city &&
     !errors.streetAddress &&
     !errors.streetAddress2 &&
-    !errors.cvv &&
     !errors.isValidCard, [errors, values])
 
   const onSubmit = () => {
@@ -86,12 +69,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     if (values.walletAddress && !web3.utils.isAddress(values.walletAddress)) {
       setFieldTouched('walletAddress', true, false)
       setFieldError('walletAddress', 'Wallet address is invalid')
-      return
-    }
-
-    if (values.cvv && values.cvv.length < 3) {
-      setFieldTouched('cvv', true, false)
-      setFieldError('cvv', 'CVV is invalid')
       return
     }
 
@@ -179,7 +156,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           ref={ref}
           config={checkoutConfig}
           cardTokenized={onGenerate}
-          frameValidationChanged={onFrameValidationChanged}
+          cardValidationChanged={onCardValidationChanged}
           cardTokenizationFailed={onGenerateTokenFailed}
         >
           <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
@@ -190,7 +167,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
             <Cvv
               onBlur={() => setFieldTouched('cvv', true)}
               onChange={(e) => setFieldValue('cvv', e)} />
-            {touched.cvv && errors.cvv && <div className='text-red-400 text-[12px] text-left'>{errors.cvv}</div>}
           </div>
         </Frames>
         {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
@@ -236,12 +212,13 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
             <input
               value={values.city}
               onBlur={() => setFieldTouched('city', true)}
-              onChange={(e) => {
-                let cityName = e.target.value;
-                cityName = cityName.replace(/[^a-zA-Z]/g, '');
-                cityName = cityName.charAt(0).toUpperCase() + cityName.slice(1).toLowerCase();
-                setFieldValue('city', cityName);
-              }}
+              onChange={(e) => setFieldValue('city', e.target.value)}
+              // onChange={(e) => {
+              //   let cityName = e.target.value;
+              //   cityName = cityName.replace(/[^a-zA-Z]/g, '');
+              //   cityName = cityName.charAt(0).toUpperCase() + cityName.slice(1).toLowerCase();
+              //   setFieldValue('city', cityName);
+              // }}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="City" />
           </div>
         </div>
