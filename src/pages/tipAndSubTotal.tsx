@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
 import { FormikProps } from "formik";
-import UsFlagImage from '../assets/images/us-flag.png'
+import { useMemo, useState } from "react";
+import UsFlagImage from '../assets/images/us-flag.png';
 import { CheckoutInfo } from "../types/checkout.type";
 
 interface Props extends FormikProps<CheckoutInfo> {
@@ -76,7 +76,7 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
             className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
             onClick={() => setFocusedCustomTip(true)}
           >
-            {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '?%'}
+            {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '__%'}
           </div>
         }
       </div>

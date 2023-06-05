@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { CheckoutInfo } from "../types/checkout.type";
-import { Frames, CardNumber, ExpiryDate, Cvv } from 'frames-react';
 import { FormikProps } from 'formik';
-import PhoneInput from 'react-phone-number-input'
-import ClockLoader from 'react-spinners/ClockLoader'
-import { checkoutConfig } from "../utils/checkout";
-import web3 from 'web3'
+import { CardNumber, Cvv, ExpiryDate, Frames } from 'frames-react';
+import { useEffect, useMemo, useRef, useState } from "react";
+import PhoneInput from 'react-phone-number-input';
+import ClockLoader from 'react-spinners/ClockLoader';
+import web3 from 'web3';
 import { stateList } from "../constants/state";
+import { CheckoutInfo } from "../types/checkout.type";
+import { checkoutConfig } from "../utils/checkout";
 interface Props extends FormikProps<CheckoutInfo> {
   checkoutRequest?: any;
 }
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onFrameValidationChanged = (e: any) => {
+  const onCardValidationChanged = (e: any) => {
     setFieldTouched('isValidCard', true, false)
     setFieldValue('isValidCard', e.isValid)
   }
@@ -48,12 +48,12 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }, [values, submitForm, isLoading])
 
   const isValid = useMemo(() =>
+    !errors.walletAddress &&
     !errors.firstName &&
     !errors.lastName &&
-    !errors.walletAddress &&
     !errors.email &&
-    !errors.phoneNumber &&
     !errors.country &&
+    !errors.phoneNumber &&
     !errors.zip &&
     !errors.state &&
     !errors.city &&
@@ -156,7 +156,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           ref={ref}
           config={checkoutConfig}
           cardTokenized={onGenerate}
-          frameValidationChanged={onFrameValidationChanged}
+          cardValidationChanged={onCardValidationChanged}
           cardTokenizationFailed={onGenerateTokenFailed}
         >
           <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
@@ -164,7 +164,9 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
           <div className="flex mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
             <ExpiryDate />
-            <Cvv />
+            <Cvv
+              onBlur={() => setFieldTouched('cvv', true)}
+              onChange={(e) => setFieldValue('cvv', e)} />
           </div>
         </Frames>
         {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
@@ -203,7 +205,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State"
             >
               <option value="">State</option>
-              {stateList.map((state) => <option key={state.value} value={state.value}>{state.label}</option>)}
+              {stateList.map((state) => <option key={state.value} value={state.value}>{state.value}</option>)}
             </select>
           </div>
           <div className="flex-1">
@@ -211,6 +213,12 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               value={values.city}
               onBlur={() => setFieldTouched('city', true)}
               onChange={(e) => setFieldValue('city', e.target.value)}
+              // onChange={(e) => {
+              //   let cityName = e.target.value;
+              //   cityName = cityName.replace(/[^a-zA-Z]/g, '');
+              //   cityName = cityName.charAt(0).toUpperCase() + cityName.slice(1).toLowerCase();
+              //   setFieldValue('city', cityName);
+              // }}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="City" />
           </div>
         </div>
