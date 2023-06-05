@@ -127,6 +127,38 @@ export const GET_CHECKOUT_REQUEST = gql`
       phoneNumber
       amount
       status
+      checkout {
+        id
+        walletAddress
+        firstName
+        lastName
+        email
+        phoneNumber
+        currency
+        amount
+        fee
+        feeType
+        feeMethod
+        tip
+        tipType
+        streetAddress
+        streetAddress2
+        city
+        state
+        zip
+        country
+        createdAt
+        updatedAt
+        transaction {
+          checkoutId
+          step
+          status
+          paidStatus
+          message
+          transactionId
+          date
+        }
+      }
     }
   }
 `

@@ -11,25 +11,25 @@ import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import { checkoutValidationSchema } from '../constants/validations';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Login } from './login';
 import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import ClockLoader from 'react-spinners/ClockLoader'
 import { useWindowFocus } from '../uses/useWindowFocus';
 
-const CHECKOUT_STORAGE_ID = 'CHECKOUT/CHECKOUT_STORAGE_ID'
 
 export function Checkout() {
   const { user, refreshUser } = useAuth()
   const { checkoutRequestId } = useParams();
-  const navigate = useNavigate();
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  const storedCheckoutId = useMemo(() => searchParams.get('id'), [searchParams])
 
   const SocureInitializer = (window as any).SocureInitializer
   const devicer = (window as any).devicer
   const Socure = (window as any).Socure
   const [isSocureProcess, setIsSocureProcess] = useState(false)
-  const [storedCheckoutId] = useState<string | null>(localStorage.getItem(CHECKOUT_STORAGE_ID))
   const carousel = useRef<any>()
   const [currentStep, setCurrentStep] = useState(0)
   const [deviceId, setDeviceId] = useState<string>()
@@ -38,7 +38,7 @@ export function Checkout() {
   const [checkout, setCheckout] = useState<any>()
   const [transaction, setTransaction] = useState<any>();
   const { isWindowFocused } = useWindowFocus()
-  const { data: checkoutRequest, error: checkoutRequestError } = useQuery(GET_CHECKOUT_REQUEST, {
+  const { data: checkoutRequest, error: checkoutRequestError, refetch: refreshCheckoutRequest } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
       id: checkoutRequestId
     },
@@ -51,7 +51,7 @@ export function Checkout() {
     variables: {
       id: storedCheckoutId
     },
-    skip: !storedCheckoutId
+    skip: !storedCheckoutId || !!checkoutRequestId
   })
 
   const userId = useMemo(() => createAccountResponse?.createUser?.id, [createAccountResponse])
@@ -75,7 +75,6 @@ export function Checkout() {
   })
 
   const onSubmitForm = (data: CheckoutInfo) => {
-    console.log(data)
     if (user) {
       createCheckout({
         variables: {
@@ -155,9 +154,7 @@ export function Checkout() {
     validationSchema: checkoutValidationSchema,
     onSubmit: onSubmitForm
   });
-  const { values, errors, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
-
-  console.log(errors)
+  const { values, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
 
   const onNext = (index: number, force = false) => {
     if (isDisabledSteps && !force) {
@@ -168,41 +165,7 @@ export function Checkout() {
   }
 
   const onResetForm = () => {
-    setValues({
-      cost: '',
-      tipPercent: '',
-      feeMethod: 0,
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      email: checkoutRequest ? checkoutRequest.checkoutRequest?.email : user?.email || '',
-      phoneNumber: checkoutRequest ? checkoutRequest.checkoutRequest?.phoneNumber : user?.phoneNumber || '',
-      streetAddress: user?.streetAddress || '',
-      streetAddress2: user?.streetAddress2 || '',
-      city: user?.city || '',
-      state: user?.state || '',
-      zip: user?.zip || '',
-      country: user?.country || 'US',
-      isValidCard: false,
-      isConfirmedPurchase: false,
-      walletAddress: '',
-      token: '',
-      taxId: '',
-      gender: 'male',
-      dob: undefined,
-      auth: 'login',
-      password: '',
-      userEmail: '',
-      userPhoneNumber: ''
-    })
-    setErrors({})
-    setTouched({})
-    resetCheckout()
-    resetCheckoutWithoutUser()
-    resetCreateAccount()
-    setTransaction(null)
-    localStorage.removeItem(CHECKOUT_STORAGE_ID)
-    navigate('/')
-    onNext(0, true)
+    window.location.href = '/'
   }
 
   useEffect(() => {
@@ -288,10 +251,6 @@ export function Checkout() {
       setFieldValue('country', checkoutData?.checkout.country || 'US', false)
       setFieldValue('cost', checkoutData?.checkout.amount, false)
       setFieldValue('tipPercent', checkoutData?.checkout.tip, false)
-
-      if (checkoutData.checkout.transaction) {
-        setTransaction(checkoutData.checkout.transaction)
-      }
     }
   }, [checkoutData, setFieldValue])
 
@@ -404,9 +363,9 @@ export function Checkout() {
 
   useEffect(() => {
     if (checkout) {
-      localStorage.setItem(CHECKOUT_STORAGE_ID, checkout.id)
-    } else {
-      localStorage.removeItem(CHECKOUT_STORAGE_ID)
+      setSearchParams({
+        id: checkout.id
+      })
     }
   }, [checkout])
 
@@ -423,12 +382,28 @@ export function Checkout() {
   }, [checkoutData])
 
   useEffect(() => {
+    if (checkoutRequest?.checkoutRequest?.checkout) {
+      setCheckout(checkoutRequest?.checkoutRequest?.checkout)
+    }
+  }, [checkoutRequest])
+
+  useEffect(() => {
+    if (checkout?.transaction) {
+      setTransaction(checkout?.transaction)
+    }
+  }, [checkout])
+
+  useEffect(() => {
     setTransaction(transactionResponse?.transaction)
   }, [transactionResponse])
 
   useEffect(() => {
     if (isWindowFocused) {
-      refetchCheckout()
+      if (checkoutRequestId) {
+        refreshCheckoutRequest()
+      } else {
+        refetchCheckout()
+      }
     }
   }, [isWindowFocused])
 
