@@ -2,7 +2,6 @@ import { FormikProps } from "formik";
 import { useMemo } from "react";
 import UsFlagImage from '../assets/images/us-flag.png';
 import UsdcIcon from '../assets/images/usdc-icon.png';
-import VisaIcon from '../assets/images/visa-icon.png';
 import { useAuth } from "../context/auth";
 import { CheckoutInfo } from "../types/checkout.type";
 
@@ -34,33 +33,17 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
           USD
         </div>
       </div>
-      <div className="flex-1 flex flex-col justify-center">
-        <p className="text-white text-lg text-left mt-2">Payment Method</p>
-        <div className="flex items-center justify-around">
-          <div>
-            <div className="mt-1 flex items-center justify-center">
-              <button
-                onClick={() => setFieldValue('feeMethod', 1)}
-                className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-              >
-                <img src={VisaIcon} alt='' className="!w-8" />
-              </button>
-            </div>
-            <div className="text-sm text-center text-white mt-2">service fee ${fee.toFixed(2)}</div>
-          </div>
-          <p hidden className="text-white text-lg">OR</p>
-          <div hidden> // hidden until we have USDC payment method defined
-            <button
-              disabled
-              className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-              onClick={() => setFieldValue('feeMethod', 2)}
-            >
-              <img src={UsdcIcon} alt='' className="!w-6" />
-            </button>
-            <div className="text-sm text-center text-white mt-1">{fee.toFixed(2)}</div>
-          </div>
+      <p className="text-white text-lg text-left mt-2">+ Service Fee</p>
+      <div className="flex w-full">
+        <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
+          {fee.toFixed(2)}
         </div>
-        {touched.feeMethod && errors.feeMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.feeMethod}</div>}
+        <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
+          <img src={UsFlagImage} alt='' className="flag mr-2" />
+          USD
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col justify-center">
       </div>
       <p className="text-white text-lg text-left">= Total</p>
       <div className="flex w-full">
@@ -79,12 +62,29 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
         </label>
         {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
       </div>
+      <div hidden> // hidden until we have USDC payment method defined
+        <button
+          disabled
+          className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+          onClick={() => setFieldValue('feeMethod', 2)}
+        >
+          <img src={UsdcIcon} alt='' className="!w-6" />
+        </button>
+        <div className="text-sm text-center text-white mt-1">{fee.toFixed(2)}</div>
+      </div>
+      <button
+        onClick={() => setFieldValue('feeMethod', 1)}
+        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${values.feeMethod === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
+      >
+        <div className="flex items-center">Credit or Debit</div>
+      </button>
+      {touched.feeMethod && errors.feeMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.feeMethod}</div>}
       <button
         disabled={!isValid}
         onClick={() => onNext()}
         className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
       >
-        {user ? 'Card Details' : 'Login'}
+        {user ? 'Card Details' : 'Proceed'}
       </button>
     </div>)
 }
