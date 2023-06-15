@@ -398,6 +398,9 @@ export function Checkout() {
   }, [transactionResponse])
 
   useEffect(() => {
+    if (['settled', 'error'].includes(transaction?.status)) {
+      return
+    }
     if (isWindowFocused) {
       if (checkoutRequestId) {
         refreshCheckoutRequest()
@@ -405,7 +408,7 @@ export function Checkout() {
         refetchCheckout()
       }
     }
-  }, [isWindowFocused])
+  }, [isWindowFocused, transaction, checkoutRequestId])
 
   return (
     <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
