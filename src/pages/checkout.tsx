@@ -408,7 +408,7 @@ export function Checkout() {
         refetchCheckout()
       }
     }
-  }, [isWindowFocused, transaction, checkoutRequestId])
+  }, [isWindowFocused])
 
   return (
     <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
