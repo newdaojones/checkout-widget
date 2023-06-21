@@ -13,11 +13,17 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isVisaCard, setIsVisaCard] = useState(true);
 
   const onCardValidationChanged = (e: any) => {
     setFieldTouched('isValidCard', true, false)
     setFieldValue('isValidCard', e.isValid)
   }
+
+  const onPaymentMethodChanged = (e: any) => {
+    setIsVisaCard(e.paymentMethod === 'Visa')
+  }
+
   const ref = useRef<any>()
 
   const onValidateWalletAddress = () => {
@@ -59,7 +65,8 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     !errors.city &&
     !errors.streetAddress &&
     !errors.streetAddress2 &&
-    !errors.isValidCard, [errors, values])
+    isVisaCard &&
+    !errors.isValidCard, [errors, values, isVisaCard])
 
   const onSubmit = () => {
     if (!isValid || isLoading) {
@@ -156,6 +163,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           ref={ref}
           config={checkoutConfig}
           cardTokenized={onGenerate}
+          paymentMethodChanged={onPaymentMethodChanged}
           cardValidationChanged={onCardValidationChanged}
           cardTokenizationFailed={onGenerateTokenFailed}
         >
@@ -169,7 +177,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               onChange={(e) => setFieldValue('cvv', e)} />
           </div>
         </Frames>
-        {touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
+        {!isVisaCard ? <div className='text-red-400 text-[12px] text-left'>We accept Visa debit/credit</div> : touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
         <div className="mt-5 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
             <input
