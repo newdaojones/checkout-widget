@@ -10,7 +10,7 @@ export const useAgreement = () => {
   const openAgreement = (url: string) => {
     setSignedAgreementId('')
 
-    const subWindow = window.open(`${url}&redirect_uri=${window.origin}`, '_blank', 'width=600,height=400,left=200,top=200');
+    const subWindow = window.open(`${url}&redirect_uri=${window.origin}`, '', 'width=600,height=400,left=200,top=200');
 
     if (subWindow) {
       subWindow.opener = window;
@@ -30,7 +30,7 @@ export const useAgreement = () => {
     if (subWindowRef.current) {
       setTimeout(() => {
         subWindowRef.current.close()
-      }, 41)
+      }, 60)
     }
   }
 

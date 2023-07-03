@@ -87,15 +87,6 @@ export const Login = ({
             Sign up
           </span>
         </div>
-        <div className="text-white border-white border-solid border-[1px] p-2 rounded mt-5 text-justify text-xs">
-          <b>US Patriot Act</b>: To help the government fight the funding of
-          terrorism and money laundering activities, federal law requires all
-          financial institutions to obtain, verify, and record information that
-          identifies each person who opens an account. What this means for you:
-          When you open an account, we will ask for your name, address, date of
-          birth, and other information that will allow us to identify you. We
-          will require your driver's license or other identifying documentation.
-        </div>
       </div>
       {!isRequiredLogin && (
         <button

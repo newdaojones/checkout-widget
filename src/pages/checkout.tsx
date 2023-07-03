@@ -3,12 +3,12 @@ import { useFormik } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Carousel from 'react-multi-carousel';
 import { useParams, useSearchParams } from 'react-router-dom';
-// import ClockLoader from 'react-spinners/ClockLoader';
+import ClockLoader from 'react-spinners/ClockLoader';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { checkoutValidationSchema } from '../constants/validations';
-// import { Login } from './login';
-// import { SignUp } from './signup';
+import { Login } from './login';
+import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import { CheckoutInfo } from '../types/checkout.type';
 import { useWindowFocus } from '../uses/useWindowFocus';
@@ -17,17 +17,19 @@ import { CardDetails } from './cardDetails';
 import { MethodAndTotal } from './methodAndTotal';
 import { TipAndSubTotal } from './tipAndSubTotal';
 import { TransactionDetails } from './transactionDetails';
+import { useAgreement } from '../context/agreement';
 
 
 export function Checkout() {
   const { user, refreshUser } = useAuth()
   const { checkoutRequestId } = useParams();
+  useAgreement()
   let [searchParams, setSearchParams] = useSearchParams();
 
   const storedCheckoutId = useMemo(() => searchParams.get('id'), [searchParams])
 
-  // const SocureInitializer = (window as any).SocureInitializer
-  // const devicer = (window as any).devicer
+  const SocureInitializer = (window as any).SocureInitializer
+  const devicer = (window as any).devicer
   const Socure = (window as any).Socure
   const [isSocureProcess, setIsSocureProcess] = useState(false)
   const carousel = useRef<any>()
@@ -58,7 +60,7 @@ export function Checkout() {
   const checkoutError = useMemo(() => errorCheckout || errorCheckoutWithoutUser, [errorCheckout, errorCheckoutWithoutUser])
   const checkoutId = useMemo(() => checkout?.id, [checkout])
   const checkoutLoading = useMemo(() => loadingCheckout || loadingCheckoutWithout, [loadingCheckout, loadingCheckoutWithout])
-  const isFinalStep = useMemo(() => currentStep === 3, [user, currentStep])
+  const isFinalStep = useMemo(() => user ? currentStep === 3 : currentStep === 4, [user, currentStep])
   const isDisabledSteps = useMemo(() => isFinalStep || isVerifying, [isFinalStep, isVerifying])
   const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
     variables: {
@@ -92,7 +94,7 @@ export function Checkout() {
             streetAddress2: data.streetAddress2 || undefined,
             city: data.city,
             state: data.state,
-            zip: data.zip,
+            postalCode: data.postalCode,
             country: data.country || undefined,
             walletAddress: data.walletAddress,
             checkoutRequestId,
@@ -116,7 +118,7 @@ export function Checkout() {
             streetAddress2: data.streetAddress2 || undefined,
             city: data.city,
             state: data.state,
-            zip: data.zip,
+            postalCode: data.postalCode,
             country: data.country || undefined,
             walletAddress: data.walletAddress,
             checkoutRequestId,
@@ -139,7 +141,7 @@ export function Checkout() {
       streetAddress2: '',
       city: '',
       state: '',
-      zip: '',
+      postalCode: '',
       country: 'US',
       isValidCard: false,
       isConfirmedPurchase: false,
@@ -147,7 +149,8 @@ export function Checkout() {
       token: '',
       auth: 'login',
       userEmail: '',
-      userPhoneNumber: ''
+      userPhoneNumber: '',
+      signedAgreementId: ''
     },
     validateOnBlur: true,
     validateOnChange: true,
@@ -181,8 +184,7 @@ export function Checkout() {
 
   useEffect(() => {
     if (checkout?.id) {
-      // onNext(user ? 3 : 4)
-      onNext(3)
+      onNext(user ? 3 : 4)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout])
@@ -233,7 +235,7 @@ export function Checkout() {
     setFieldValue('streetAddress2', user?.streetAddress2 || '', false)
     setFieldValue('city', user?.city || '', false)
     setFieldValue('state', user?.state || '', false)
-    setFieldValue('zip', user?.zip || '', false)
+    setFieldValue('postalCode', user?.postalCode || '', false)
     setFieldValue('country', user?.country || 'US', false)
     setFieldValue('password', '', false)
   }, [checkoutRequest, user, setFieldValue])
@@ -248,7 +250,7 @@ export function Checkout() {
       setFieldValue('streetAddress2', checkoutData?.checkout.streetAddress2 || '', false)
       setFieldValue('city', checkoutData?.checkout.city || '', false)
       setFieldValue('state', checkoutData?.checkout.state || '', false)
-      setFieldValue('zip', checkoutData?.checkout.zip || '', false)
+      setFieldValue('postalCode', checkoutData?.checkout.postalCode || '', false)
       setFieldValue('country', checkoutData?.checkout.country || 'US', false)
       setFieldValue('cost', checkoutData?.checkout.amount, false)
       setFieldValue('tipPercent', checkoutData?.checkout.tip, false)
@@ -289,12 +291,12 @@ export function Checkout() {
           password: values.password,
           gender: values.gender || 'male',
           dob: values.dob,
-          taxId: values.taxId,
+          ssn: values.ssn,
           streetAddress: values.streetAddress,
           streetAddress2: values.streetAddress2,
           city: values.city,
           state: values.state,
-          zip: values.zip,
+          postalCode: values.postalCode,
           country: values.country,
           documentId,
           deviceId,
@@ -313,39 +315,39 @@ export function Checkout() {
     }
   }, [userId])
 
-  // const initSourcer = () => {
-  //   var config = {
-  //     onProgress: (res: any) => { },
-  //     onSuccess: (res: any) => {
-  //       if (res.status === 'DOCUMENTS_UPLOADED') {
-  //         setDocumentId(res.documentUuid)
-  //       }
-  //     },
-  //     onError: (err: any) => {
-  //       toast.error('Failed verify your identify, please try again')
-  //       Socure.cleanup()
-  //     },
-  //     qrCodeNeeded: true //toggle the QR code display
-  //   };
-  //   SocureInitializer.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY)
-  //     .then((lib: any) => {
-  //       lib.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY, "#socure", config).then(function () {
-  //         lib.start(1);
-  //       })
-  //     }).catch((err: any) => {
-  //     })
-  // }
+  const initSourcer = () => {
+    var config = {
+      onProgress: (res: any) => { },
+      onSuccess: (res: any) => {
+        if (res.status === 'DOCUMENTS_UPLOADED') {
+          setDocumentId(res.documentUuid)
+        }
+      },
+      onError: (err: any) => {
+        toast.error('Failed verify your identify, please try again')
+        Socure.cleanup()
+      },
+      qrCodeNeeded: true //toggle the QR code display
+    };
+    SocureInitializer.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY)
+      .then((lib: any) => {
+        lib.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY, "#socure", config).then(function () {
+          lib.start(1);
+        })
+      }).catch((err: any) => {
+      })
+  }
 
-  // const getDeviceId = () => {
-  //   var deviceFPOptions = {
-  //     publicKey: process.env.REACT_APP_SOCURE_PUBLIC_KEY,
-  //     userConsent: true,
-  //     context: 'signup'
-  //   };
-  //   devicer.run(deviceFPOptions, function (response: any) {
-  //     setDeviceId(response.sessionId)
-  //   })
-  // }
+  const getDeviceId = () => {
+    var deviceFPOptions = {
+      publicKey: process.env.REACT_APP_SOCURE_PUBLIC_KEY,
+      userConsent: true,
+      context: 'signup'
+    };
+    devicer.run(deviceFPOptions, function (response: any) {
+      setDeviceId(response.sessionId)
+    })
+  }
 
   const cleanSocure = () => {
     Socure?.cleanup()
@@ -353,8 +355,8 @@ export function Checkout() {
 
   useEffect(() => {
     if (isSocureProcess) {
-      // initSourcer()
-      // getDeviceId()
+      initSourcer()
+      getDeviceId()
     }
 
     return () => {
@@ -412,8 +414,7 @@ export function Checkout() {
   }, [isWindowFocused])
 
   return (
-    // <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
-    <div className={'widget'}>
+    <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
       <Carousel
         ref={carousel}
         additionalTransfrom={0}
@@ -463,6 +464,24 @@ export function Checkout() {
           {...checkoutInfo}
           onNext={() => onNext(2)}
         />
+        {values.auth === 'signup' && !user &&
+          <>
+            {isVerifying ? <div className='widget-container flex flex-col flex-1 items-center justify-center text-white'>
+              <ClockLoader size={30} color='white' className="mb-4" />
+              Processing KYC, please wait...
+            </div>
+              : isSocureProcess ? <div id='socure' /> : <SignUp
+                {...checkoutInfo}
+                onNext={() => {
+                  setIsSocureProcess(true)
+                }}
+              />}
+          </>
+        }
+        {values.auth === 'login' && !user && <Login
+          {...checkoutInfo}
+          onNext={() => onNext(currentStep + 1)}
+        />}
         <CardDetails
           checkoutRequest={checkoutRequest?.checkoutRequest}
           {...checkoutInfo}
