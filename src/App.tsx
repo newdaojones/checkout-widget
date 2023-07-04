@@ -12,6 +12,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from './context/auth';
 import { Header } from './components/header';
 import { PrimeTrustTerms } from './pages/primeTrustTerms';
+import { KycSuccess } from './pages/kycSucess';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <div className='flex items-center justify-center w-full flex-1 overflow-auto py-10'>
               <Routes>
                 <Route path='/prime-trust/terms' element={<PrimeTrustTerms />} />
+                <Route path='/kyc-success' element={<KycSuccess />} />
                 <Route path='/:checkoutRequestId' element={<Checkout />} />
                 <Route path='/' element={<Checkout />} />
               </Routes>

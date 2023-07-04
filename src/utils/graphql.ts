@@ -76,6 +76,7 @@ export const CREATE_ACCOUNT = gql`
       isVerified
       createdAt
       updatedAt
+      token
     }
   }
 `;
@@ -216,3 +217,15 @@ export const GET_AGREEMENT_LINK = gql`
     agreementLink
   }
 `
+
+export const GET_KYC_LINK = gql`
+  query kycLink {
+    kycLink
+  }
+`
+
+export const KYC_COMPLETED = gql`
+  mutation keyCompleted {
+    keyCompleted
+  }
+`;

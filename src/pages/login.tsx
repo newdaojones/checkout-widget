@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { CheckoutInfo } from "../types/checkout.type";
 import { useAuth } from "../context/auth";
 
@@ -67,6 +67,7 @@ export const Login = ({
         <div className="flex flex-col justify-center mt-3 w-full">
           <input
             value={values.password}
+            type="password"
             onBlur={() => setFieldTouched("password", true)}
             onChange={(e) => setFieldValue("password", e.target.value)}
             className="text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"

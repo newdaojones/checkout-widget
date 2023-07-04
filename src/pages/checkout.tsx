@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { useFormik } from 'formik';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import moment from 'moment-timezone';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Carousel from 'react-multi-carousel';
 import { useParams, useSearchParams } from 'react-router-dom';
-import ClockLoader from 'react-spinners/ClockLoader';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { checkoutValidationSchema } from '../constants/validations';
@@ -12,33 +12,28 @@ import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import { CheckoutInfo } from '../types/checkout.type';
 import { useWindowFocus } from '../uses/useWindowFocus';
-import { ACCOUNT_VERIFY, CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT, GET_CHECKOUT_REQUEST, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
+import { CREATE_ACCOUNT, CREATE_CHECKOUT, CREATE_CHECKOUT_WITHOUT_USER, GET_CHECKOUT, GET_CHECKOUT_REQUEST, GET_KYC_LINK, TRANSACTION_SUBSCRIPTION } from '../utils/graphql';
 import { CardDetails } from './cardDetails';
 import { MethodAndTotal } from './methodAndTotal';
 import { TipAndSubTotal } from './tipAndSubTotal';
 import { TransactionDetails } from './transactionDetails';
 import { useAgreement } from '../context/agreement';
+import { KycProcess } from './kycProcess';
 
 
 export function Checkout() {
+  const refreshUserRef = useRef<any>()
   const { user, refreshUser } = useAuth()
   const { checkoutRequestId } = useParams();
   useAgreement()
   let [searchParams, setSearchParams] = useSearchParams();
 
   const storedCheckoutId = useMemo(() => searchParams.get('id'), [searchParams])
-
-  const SocureInitializer = (window as any).SocureInitializer
-  const devicer = (window as any).devicer
-  const Socure = (window as any).Socure
-  const [isSocureProcess, setIsSocureProcess] = useState(false)
   const carousel = useRef<any>()
   const [currentStep, setCurrentStep] = useState(0)
-  const [deviceId, setDeviceId] = useState<string>()
-  const [documentId, setDocumentId] = useState<string>()
-  const [isVerifying, setIsVerifing] = useState(false)
   const [checkout, setCheckout] = useState<any>()
   const [transaction, setTransaction] = useState<any>();
+  const [isKycProcessing, setIsKycProcessing] = useState(false)
   const { isWindowFocused } = useWindowFocus()
   const { data: checkoutRequest, error: checkoutRequestError, refetch: refreshCheckoutRequest } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
@@ -47,33 +42,30 @@ export function Checkout() {
     skip: !checkoutRequestId
   })
   const [createCheckout, { data: checkoutResponse, loading: loadingCheckout, error: errorCheckout, reset: resetCheckout }] = useMutation(CREATE_CHECKOUT);
-  const [createCheckoutWithoutUser, { data: checkoutWithoutUserRes, loading: loadingCheckoutWithout, error: errorCheckoutWithoutUser, reset: resetCheckoutWithoutUser }] = useMutation(CREATE_CHECKOUT_WITHOUT_USER);
-  const [createAccount, { data: createAccountResponse, loading: loadingCreateAccount, error: createAccountError, reset: resetCreateAccount }] = useMutation(CREATE_ACCOUNT)
+  const [createCheckoutWithoutUser, { data: checkoutWithoutUserRes, loading: loadingCheckoutWithout, error: errorCheckoutWithoutUser }] = useMutation(CREATE_CHECKOUT_WITHOUT_USER);
+  const [createAccount, { data: createAccountResponse, loading: loadingCreateAccount, error: createAccountError }] = useMutation(CREATE_ACCOUNT)
   const { data: checkoutData, refetch: refetchCheckout } = useQuery(GET_CHECKOUT, {
     variables: {
       id: storedCheckoutId
     },
     skip: !storedCheckoutId || !!checkoutRequestId
   })
+  const { data: kycLinkRes } = useQuery(GET_KYC_LINK, {
+    skip: !isKycProcessing
+  })
 
-  const userId = useMemo(() => createAccountResponse?.createUser?.id, [createAccountResponse])
+  const keyLink = useMemo(() => kycLinkRes?.kycLink, [kycLinkRes])
   const checkoutError = useMemo(() => errorCheckout || errorCheckoutWithoutUser, [errorCheckout, errorCheckoutWithoutUser])
   const checkoutId = useMemo(() => checkout?.id, [checkout])
   const checkoutLoading = useMemo(() => loadingCheckout || loadingCheckoutWithout, [loadingCheckout, loadingCheckoutWithout])
   const isFinalStep = useMemo(() => user ? currentStep === 3 : currentStep === 4, [user, currentStep])
-  const isDisabledSteps = useMemo(() => isFinalStep || isVerifying, [isFinalStep, isVerifying])
+  const isDisabledSteps = useMemo(() => isFinalStep || isKycProcessing, [isFinalStep, isKycProcessing])
   const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
     variables: {
       checkoutId,
     },
     shouldResubscribe: isWindowFocused,
     skip: !checkoutId || !isWindowFocused
-  })
-  const { data: userVerify, error: userVerifyError } = useSubscription(ACCOUNT_VERIFY, {
-    variables: {
-      userId
-    },
-    skip: !userId
   })
 
   const onSubmitForm = (data: CheckoutInfo) => {
@@ -142,7 +134,7 @@ export function Checkout() {
       city: '',
       state: '',
       postalCode: '',
-      country: 'US',
+      country: 'USA',
       isValidCard: false,
       isConfirmedPurchase: false,
       walletAddress: '',
@@ -157,7 +149,7 @@ export function Checkout() {
     validationSchema: checkoutValidationSchema,
     onSubmit: onSubmitForm
   });
-  const { values, setFieldValue, setValues, setErrors, setTouched } = checkoutInfo
+  const { values, setFieldValue } = checkoutInfo
 
   const onNext = (index: number, force = false) => {
     if (isDisabledSteps && !force) {
@@ -196,10 +188,11 @@ export function Checkout() {
   }, [transaction])
 
   useEffect(() => {
-    if (userVerifyError) {
-      toast.error(userVerifyError.message)
+    if (createAccountResponse?.createUser?.token) {
+      localStorage.setItem('auth_token', createAccountResponse?.createUser?.token)
+      refreshUser()
     }
-  }, [userVerifyError])
+  }, [createAccountResponse])
 
   useEffect(() => {
     if (transaction?.paidStatus === 'paid') {
@@ -236,7 +229,7 @@ export function Checkout() {
     setFieldValue('city', user?.city || '', false)
     setFieldValue('state', user?.state || '', false)
     setFieldValue('postalCode', user?.postalCode || '', false)
-    setFieldValue('country', user?.country || 'US', false)
+    setFieldValue('country', user?.country || 'USA', false)
     setFieldValue('password', '', false)
   }, [checkoutRequest, user, setFieldValue])
 
@@ -251,7 +244,7 @@ export function Checkout() {
       setFieldValue('city', checkoutData?.checkout.city || '', false)
       setFieldValue('state', checkoutData?.checkout.state || '', false)
       setFieldValue('postalCode', checkoutData?.checkout.postalCode || '', false)
-      setFieldValue('country', checkoutData?.checkout.country || 'US', false)
+      setFieldValue('country', checkoutData?.checkout.country || 'USA', false)
       setFieldValue('cost', checkoutData?.checkout.amount, false)
       setFieldValue('tipPercent', checkoutData?.checkout.tip, false)
     }
@@ -259,28 +252,11 @@ export function Checkout() {
 
   useEffect(() => {
     if (createAccountError) {
-      cleanSocure()
       toast.error(createAccountError.message)
     }
   }, [createAccountError])
 
-  useEffect(() => {
-    if (userVerify?.userVerify?.status === 'opened') {
-      localStorage.setItem('auth_token', userVerify?.userVerify?.token)
-      setIsVerifing(false)
-      refreshUser()
-    } else if (userVerify?.userVerify?.status === 'denied') {
-      setIsVerifing(false)
-      toast.error('Denied your KYC process, please try again')
-    }
-  }, [userVerify])
-
-  const onCreateAccount = useCallback(() => {
-    if (!isSocureProcess || !documentId || !deviceId) {
-      return
-    }
-
-    setIsSocureProcess(false)
+  const onCreateAccount = () => {
     createAccount({
       variables: {
         data: {
@@ -290,7 +266,7 @@ export function Checkout() {
           phoneNumber: values.userPhoneNumber,
           password: values.password,
           gender: values.gender || 'male',
-          dob: values.dob,
+          dob: moment(values.dob).format('YYYY-MM-DD'),
           ssn: values.ssn,
           streetAddress: values.streetAddress,
           streetAddress2: values.streetAddress2,
@@ -298,71 +274,40 @@ export function Checkout() {
           state: values.state,
           postalCode: values.postalCode,
           country: values.country,
-          documentId,
-          deviceId,
+          signedAgreementId: values.signedAgreementId,
         }
       }
     })
-  }, [isSocureProcess, documentId, deviceId, values, createAccount])
-
-  useEffect(() => {
-    onCreateAccount()
-  }, [onCreateAccount])
-
-  useEffect(() => {
-    if (userId) {
-      setIsVerifing(true);
-    }
-  }, [userId])
-
-  const initSourcer = () => {
-    var config = {
-      onProgress: (res: any) => { },
-      onSuccess: (res: any) => {
-        if (res.status === 'DOCUMENTS_UPLOADED') {
-          setDocumentId(res.documentUuid)
-        }
-      },
-      onError: (err: any) => {
-        toast.error('Failed verify your identify, please try again')
-        Socure.cleanup()
-      },
-      qrCodeNeeded: true //toggle the QR code display
-    };
-    SocureInitializer.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY)
-      .then((lib: any) => {
-        lib.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY, "#socure", config).then(function () {
-          lib.start(1);
-        })
-      }).catch((err: any) => {
-      })
   }
 
-  const getDeviceId = () => {
-    var deviceFPOptions = {
-      publicKey: process.env.REACT_APP_SOCURE_PUBLIC_KEY,
-      userConsent: true,
-      context: 'signup'
-    };
-    devicer.run(deviceFPOptions, function (response: any) {
-      setDeviceId(response.sessionId)
-    })
+  const onProcessKey = () => {
+    setIsKycProcessing(true)
   }
 
-  const cleanSocure = () => {
-    Socure?.cleanup()
-  }
+  // KYC PROCESS Start
+  useEffect(() => {
+    if (refreshUserRef.current) {
+      clearInterval(refreshUserRef.current)
+    }
+
+    if (isKycProcessing) {
+      refreshUserRef.current = setInterval(() => refreshUser(), 5000)
+    }
+  }, [isKycProcessing])
 
   useEffect(() => {
-    if (isSocureProcess) {
-      initSourcer()
-      getDeviceId()
+    if (isKycProcessing && keyLink) {
+      window.open(keyLink, '_blank')
     }
+  }, [isKycProcessing, keyLink])
 
-    return () => {
-      cleanSocure()
+  useEffect(() => {
+    if (user?.isVerified) {
+      setIsKycProcessing(false)
     }
-  }, [isSocureProcess])
+  }, [user])
+
+  // KYC PROCESS End
 
   useEffect(() => {
     if (checkout) {
@@ -414,7 +359,7 @@ export function Checkout() {
   }, [isWindowFocused])
 
   return (
-    <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
+    <div className="widget">
       <Carousel
         ref={carousel}
         additionalTransfrom={0}
@@ -464,19 +409,12 @@ export function Checkout() {
           {...checkoutInfo}
           onNext={() => onNext(2)}
         />
+        {user && !user?.isVerified && <KycProcess onNext={() => onProcessKey()} />}
         {values.auth === 'signup' && !user &&
-          <>
-            {isVerifying ? <div className='widget-container flex flex-col flex-1 items-center justify-center text-white'>
-              <ClockLoader size={30} color='white' className="mb-4" />
-              Processing KYC, please wait...
-            </div>
-              : isSocureProcess ? <div id='socure' /> : <SignUp
-                {...checkoutInfo}
-                onNext={() => {
-                  setIsSocureProcess(true)
-                }}
-              />}
-          </>
+          <SignUp
+            {...checkoutInfo}
+            onNext={() => onCreateAccount()}
+          />
         }
         {values.auth === 'login' && !user && <Login
           {...checkoutInfo}
@@ -499,10 +437,10 @@ export function Checkout() {
         {!user && <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>}
         <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${(!user ? currentStep === 4 : currentStep === 3) ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
       </div>
-      {(checkoutLoading || loadingCreateAccount) && (
+      {(checkoutLoading || loadingCreateAccount || isKycProcessing) && (
         <div className="absolute w-full h-full bg-white/10 flex flex-col items-center justify-center top-0">
           <FadeLoader color="white" />
-          <div className='mt-2 text-black'>{loadingCreateAccount ? 'Creating account...' : 'Sending request...'}</div>
+          <div className='mt-2 text-white'>{loadingCreateAccount ? 'Creating account...' : isKycProcessing ? 'Processing KYC...' : 'Sending request...'}</div>
         </div>
       )}
     </div>
