@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "../context/auth";
 
 interface Props {
   onNext: () => void;
@@ -7,13 +8,13 @@ interface Props {
 export const KycProcess = ({
   onNext,
 }: Props) => {
-
+  const { user } = useAuth()
   return (
     <div className="widget-container flex flex-col">
       <h3 className="text-white text-4xl mb-10 text-center">KYC Process</h3>
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="text-center text-white mb-5">
-          Required kyc process for trading assets
+          {user.status === 'rejected' ? 'Failed KYC, please try again' : 'Required KYC process for trading assets'}
         </div>
 
       </div>
