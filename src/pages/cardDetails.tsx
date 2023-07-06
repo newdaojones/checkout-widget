@@ -34,7 +34,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   const onGenerateTokenFailed = (e: any) => {
-    console.log(e)
     Frames.init(checkoutConfig)
     setFieldValue('isValidCard', false)
     setFieldValue('token', '')
@@ -47,7 +46,9 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   useEffect(() => {
+    console.log(values.isValidCard, values.token, isLoading)
     if (values.isValidCard && values.token && isLoading) {
+      console.log('========')
       submitForm()
       setIsLoading(false)
     }

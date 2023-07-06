@@ -10,7 +10,7 @@ export const checkoutValidationSchema = yup.object().shape({
   userPhoneNumber: yup.string(),
   country: yup.string().optional(),
   postalCode: yup.string().required('Zip Code is required'),
-  ssn: yup.string().required('SSN is required').matches(/^(?!666|000|9\d{2})\d{3}-(?!00)\d{2}-(?!0{4})\d{4}$/, 'SSN is invalid'),
+  ssn: yup.string().matches(/^(?!666|000|9\d{2})\d{3}-(?!00)\d{2}-(?!0{4})\d{4}$/, 'SSN is invalid'),
   state: yup.string().required('State is required'),
   city: yup.string().required('City is required'),
   streetAddress: yup.string().required('Street Address is required'),
