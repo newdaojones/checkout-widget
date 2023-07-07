@@ -13,6 +13,7 @@ import { AuthProvider } from './context/auth';
 import { Header } from './components/header';
 import { PrimeTrustTerms } from './pages/primeTrustTerms';
 import { KycSuccess } from './pages/kycSucess';
+import { AgreementAccept } from './pages/agreementAccept';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               <Routes>
                 <Route path='/prime-trust/terms' element={<PrimeTrustTerms />} />
                 <Route path='/kyc-success' element={<KycSuccess />} />
+                <Route path='/agreement-accept' element={<AgreementAccept />} />
                 <Route path='/:checkoutRequestId' element={<Checkout />} />
                 <Route path='/' element={<Checkout />} />
               </Routes>
