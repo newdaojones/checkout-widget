@@ -7,10 +7,23 @@ export const KycSuccess = () => {
 
 
   useEffect(() => {
-    createKycCompleted()
-    setTimeout(() => {
+    // callback function to call when event triggers
+    const onPageLoad = () => {
       window.close()
-    }, 1000)
+    };
+
+    // Check if the page has already loaded
+    if (document.readyState === 'complete') {
+      onPageLoad();
+    } else {
+      window.addEventListener('load', onPageLoad, false);
+      // Remove the event listener when component unmounts
+      return () => window.removeEventListener('load', onPageLoad);
+    }
+  }, []);
+
+  useEffect(() => {
+    createKycCompleted()
   }, [])
   return <></>
 }
