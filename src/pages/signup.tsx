@@ -50,7 +50,7 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
     if (signedAgreementId) {
       return
     }
-    console.log(agreementLink)
+
     if (agreementLink) {
       openAgreement(agreementLink)
     } else {
@@ -250,20 +250,16 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
           </div>
         </div>
       </div>
+      <label className="text-white text-xs mt-5 cursor-pointer select-none">
+        <input className="checkbox" type="checkbox" checked={!!values.signedAgreementId} onClick={() => onGetAgreementLink()} />
+        Click here to review and accept <span className="text-pink-500">Bridge terms of service (TOS)</span>.
+      </label>
+      {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
+
       <div className="text-white mt-5">
         Have an account? <span className="cursor-pointer text-purple-600" onClick={() => setFieldValue('auth', 'login')}>Login</span>
       </div>
     </div>
-    {!signedAgreementId && (
-      <button
-        onClick={onGetAgreementLink}
-        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white bg-gradient-to-b from-purple-400 to-purple-600`}
-      >
-        <div className="flex items-center">
-          Accept Agreement
-        </div>
-      </button>
-    )}
 
     <button
       onClick={() => isValid && onNext()}
