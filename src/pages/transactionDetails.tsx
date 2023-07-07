@@ -51,7 +51,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           <p className="text-white text-lg text-left">Transaction Status</p>
           <div className="flex w-full">
             <CopyToClipboard
-              text={transaction?.transactionId ? `https://snowtrace.io/tx/${transaction?.transactionId}` : ''}
+              text={transaction?.transactionId ? `https://mumbai.polygonscan.com/tx/${transaction?.transactionId}` : ''}
               onCopy={() => {
                 if (transaction?.transactionId) {
                   toast.success('Copied transaction')
