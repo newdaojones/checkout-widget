@@ -12,7 +12,7 @@ export interface CheckoutInfo {
     streetAddress2?: string,
     city: string,
     state: string,
-    zip: string,
+    postalCode: string,
     country: string
     isValidCard: boolean
     isConfirmedPurchase: boolean
@@ -20,7 +20,8 @@ export interface CheckoutInfo {
     token: string
     dob?: Date,
     gender?: string
-    taxId?: string
+    ssn?: string
     userEmail: string
     userPhoneNumber: string
+    signedAgreementId: string
 }

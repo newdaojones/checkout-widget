@@ -4,6 +4,9 @@ import { CheckoutInfo } from "../types/checkout.type";
 import PhoneInput from 'react-phone-number-input'
 import DatePicker from "react-datepicker";
 import { stateList } from "../constants/state";
+import { useQuery } from "@apollo/client";
+import { GET_AGREEMENT_LINK } from "../utils/graphql";
+import { useAgreement } from "../context/agreement";
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
@@ -11,38 +14,59 @@ interface Props extends FormikProps<CheckoutInfo> {
 }
 
 export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTouched, setFieldValue, onNext }: Props) => {
-  const [isConfirmed, setIsConfirmed] = useState(false)
+  const { signedAgreementId, openAgreement } = useAgreement()
+  const [isGetAgreementLink, setIsGetAgreementLink] = useState(false)
+  const { data: agreementLinkRes } = useQuery(GET_AGREEMENT_LINK, {
+    skip: !isGetAgreementLink
+  })
+  const agreementLink = useMemo(() => agreementLinkRes?.agreementLink, [agreementLinkRes])
   const isValid = useMemo(() =>
     !errors.firstName &&
     !errors.lastName &&
     !errors.dob &&
     !errors.userEmail &&
     !errors.userPhoneNumber &&
-    !errors.taxId &&
+    !errors.ssn &&
     !errors.password &&
     !errors.streetAddress &&
     !errors.city &&
     !errors.state &&
-    !errors.zip &&
+    !errors.postalCode &&
     values.firstName &&
     values.lastName &&
     values.dob &&
     values.userEmail &&
     values.userPhoneNumber &&
-    values.taxId &&
+    values.ssn &&
     values.password &&
     values.streetAddress &&
     values.city &&
     values.state &&
-    values.zip &&
-    isConfirmed
+    values.postalCode &&
+    values.signedAgreementId
     , [values, errors])
 
-  useEffect(() => {
-    if (!values.firstName || !values.lastName) {
-      setIsConfirmed(false)
+  const onGetAgreementLink = () => {
+    if (signedAgreementId) {
+      return
     }
-  }, [values])
+    console.log(agreementLink)
+    if (agreementLink) {
+      openAgreement(agreementLink)
+    } else {
+      setIsGetAgreementLink(true)
+    }
+  }
+
+  useEffect(() => {
+    setFieldValue('signedAgreementId', signedAgreementId)
+  }, [signedAgreementId, setFieldValue])
+
+  useEffect(() => {
+    if (agreementLink && !signedAgreementId) {
+      openAgreement(agreementLink)
+    }
+  }, [agreementLink])
 
   return <div className='widget-container flex flex-col'>
     <h3 className="text-white text-4xl mb-10 text-center">Sign Up</h3>
@@ -110,13 +134,13 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
       </div>
       <div className="flex-1 flex flex-col justify-center mt-3 w-full">
         <input
-          value={values.taxId}
-          onBlur={() => setFieldTouched('taxId', true)}
-          onChange={(e) => setFieldValue('taxId', e.target.value)}
+          value={values.ssn}
+          onBlur={() => setFieldTouched('ssn', true)}
+          onChange={(e) => setFieldValue('ssn', e.target.value)}
           className="mt-3 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white"
-          placeholder="Tax Number ID"
+          placeholder="SSN"
         />
-        {touched.taxId && !values.taxId && <div className='text-red-400 text-[12px] text-left'>Tax Number ID is required</div>}
+        {touched.ssn && errors.ssn && <div className='text-red-400 text-[12px] text-left'>{errors.ssn}</div>}
         <div className="flex mt-3 text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm placeholder-white">
           <PhoneInput
             defaultCountry="US"
@@ -158,10 +182,10 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
           </div>
           <div className="flex-1">
             <input
-              value={values.zip}
-              onBlur={() => setFieldTouched('zip', true)}
-              onChange={(e) => setFieldValue('zip', e.target.value)}
-              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Zip" />
+              value={values.postalCode}
+              onBlur={() => setFieldTouched('postalCode', true)}
+              onChange={(e) => setFieldValue('postalCode', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Postal Code" />
           </div>
         </div>
         <div className="flex">
@@ -169,7 +193,7 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
             {touched.country && errors.country && <div className='text-red-400 text-[12px] text-left'>{errors.country}</div>}
           </div>
           <div className="flex-1">
-            {touched.zip && errors.zip && <div className='text-red-400 text-[12px] text-left'>{errors.zip}</div>}
+            {touched.postalCode && errors.postalCode && <div className='text-red-400 text-[12px] text-left'>{errors.postalCode}</div>}
           </div>
         </div>
         <div
@@ -230,15 +254,17 @@ export const SignUp = ({ checkoutRequestId, touched, errors, values, setFieldTou
         Have an account? <span className="cursor-pointer text-purple-600" onClick={() => setFieldValue('auth', 'login')}>Login</span>
       </div>
     </div>
-    {values.firstName && values.lastName && (
-      <div className="mt-6 mb-2 text-left">
-        <label className="text-white text-xs cursor-pointer select-none">
-          <input className="checkbox" type="checkbox" checked={isConfirmed} onChange={() => setIsConfirmed(!isConfirmed)} />
-          Please check the box to acknowledge your intent. You can view our financial partner Prime Trust’s <a onClick={(e) => e.stopPropagation()} className="text-purple-500 underline" href={`prime-trust/terms?name=${values.firstName} ${values.lastName}`} target="_blank">terms and conditions</a>.
-        </label>
-        {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
-      </div>
+    {!signedAgreementId && (
+      <button
+        onClick={onGetAgreementLink}
+        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white bg-gradient-to-b from-purple-400 to-purple-600`}
+      >
+        <div className="flex items-center">
+          Accept Agreement
+        </div>
+      </button>
     )}
+
     <button
       onClick={() => isValid && onNext()}
       className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${isValid ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
