@@ -1,5 +1,6 @@
 export const checkoutConfig = {
   debug: false,
+  acceptedPaymentMethods: ['Visa'],
   publicKey: process.env.REACT_APP_CHECKOUT_PUBLIC_KEY as string,
   style: {
     base: {

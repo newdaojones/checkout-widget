@@ -3,12 +3,12 @@ import { useFormik } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Carousel from 'react-multi-carousel';
 import { useParams, useSearchParams } from 'react-router-dom';
-import ClockLoader from 'react-spinners/ClockLoader';
+// import ClockLoader from 'react-spinners/ClockLoader';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from 'react-toastify';
 import { checkoutValidationSchema } from '../constants/validations';
-import { Login } from './login';
-import { SignUp } from './signup';
+// import { Login } from './login';
+// import { SignUp } from './signup';
 import { useAuth } from '../context/auth';
 import { CheckoutInfo } from '../types/checkout.type';
 import { useWindowFocus } from '../uses/useWindowFocus';
@@ -26,8 +26,8 @@ export function Checkout() {
 
   const storedCheckoutId = useMemo(() => searchParams.get('id'), [searchParams])
 
-  const SocureInitializer = (window as any).SocureInitializer
-  const devicer = (window as any).devicer
+  // const SocureInitializer = (window as any).SocureInitializer
+  // const devicer = (window as any).devicer
   const Socure = (window as any).Socure
   const [isSocureProcess, setIsSocureProcess] = useState(false)
   const carousel = useRef<any>()
@@ -58,7 +58,7 @@ export function Checkout() {
   const checkoutError = useMemo(() => errorCheckout || errorCheckoutWithoutUser, [errorCheckout, errorCheckoutWithoutUser])
   const checkoutId = useMemo(() => checkout?.id, [checkout])
   const checkoutLoading = useMemo(() => loadingCheckout || loadingCheckoutWithout, [loadingCheckout, loadingCheckoutWithout])
-  const isFinalStep = useMemo(() => user ? currentStep === 3 : currentStep === 4, [user, currentStep])
+  const isFinalStep = useMemo(() => currentStep === 3, [user, currentStep])
   const isDisabledSteps = useMemo(() => isFinalStep || isVerifying, [isFinalStep, isVerifying])
   const { data: transactionResponse } = useSubscription(TRANSACTION_SUBSCRIPTION, {
     variables: {
@@ -181,7 +181,8 @@ export function Checkout() {
 
   useEffect(() => {
     if (checkout?.id) {
-      onNext(user ? 3 : 4)
+      // onNext(user ? 3 : 4)
+      onNext(3)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout])
@@ -312,39 +313,39 @@ export function Checkout() {
     }
   }, [userId])
 
-  const initSourcer = () => {
-    var config = {
-      onProgress: (res: any) => { },
-      onSuccess: (res: any) => {
-        if (res.status === 'DOCUMENTS_UPLOADED') {
-          setDocumentId(res.documentUuid)
-        }
-      },
-      onError: (err: any) => {
-        toast.error('Failed verify your identify, please try again')
-        Socure.cleanup()
-      },
-      qrCodeNeeded: true //toggle the QR code display
-    };
-    SocureInitializer.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY)
-      .then((lib: any) => {
-        lib.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY, "#socure", config).then(function () {
-          lib.start(1);
-        })
-      }).catch((err: any) => {
-      })
-  }
+  // const initSourcer = () => {
+  //   var config = {
+  //     onProgress: (res: any) => { },
+  //     onSuccess: (res: any) => {
+  //       if (res.status === 'DOCUMENTS_UPLOADED') {
+  //         setDocumentId(res.documentUuid)
+  //       }
+  //     },
+  //     onError: (err: any) => {
+  //       toast.error('Failed verify your identify, please try again')
+  //       Socure.cleanup()
+  //     },
+  //     qrCodeNeeded: true //toggle the QR code display
+  //   };
+  //   SocureInitializer.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY)
+  //     .then((lib: any) => {
+  //       lib.init(process.env.REACT_APP_SOCURE_PUBLIC_KEY, "#socure", config).then(function () {
+  //         lib.start(1);
+  //       })
+  //     }).catch((err: any) => {
+  //     })
+  // }
 
-  const getDeviceId = () => {
-    var deviceFPOptions = {
-      publicKey: process.env.REACT_APP_SOCURE_PUBLIC_KEY,
-      userConsent: true,
-      context: 'signup'
-    };
-    devicer.run(deviceFPOptions, function (response: any) {
-      setDeviceId(response.sessionId)
-    })
-  }
+  // const getDeviceId = () => {
+  //   var deviceFPOptions = {
+  //     publicKey: process.env.REACT_APP_SOCURE_PUBLIC_KEY,
+  //     userConsent: true,
+  //     context: 'signup'
+  //   };
+  //   devicer.run(deviceFPOptions, function (response: any) {
+  //     setDeviceId(response.sessionId)
+  //   })
+  // }
 
   const cleanSocure = () => {
     Socure?.cleanup()
@@ -352,8 +353,8 @@ export function Checkout() {
 
   useEffect(() => {
     if (isSocureProcess) {
-      initSourcer()
-      getDeviceId()
+      // initSourcer()
+      // getDeviceId()
     }
 
     return () => {
@@ -398,6 +399,9 @@ export function Checkout() {
   }, [transactionResponse])
 
   useEffect(() => {
+    if (['settled', 'error'].includes(transaction?.status)) {
+      return
+    }
     if (isWindowFocused) {
       if (checkoutRequestId) {
         refreshCheckoutRequest()
@@ -408,7 +412,8 @@ export function Checkout() {
   }, [isWindowFocused])
 
   return (
-    <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
+    // <div className={`widget ${isSocureProcess && currentStep === 2 ? 'white' : ''}`}>
+    <div className={'widget'}>
       <Carousel
         ref={carousel}
         additionalTransfrom={0}
@@ -458,24 +463,6 @@ export function Checkout() {
           {...checkoutInfo}
           onNext={() => onNext(2)}
         />
-        {values.auth === 'signup' && !user &&
-          <>
-            {isVerifying ? <div className='widget-container flex flex-col flex-1 items-center justify-center text-white'>
-              <ClockLoader size={30} color='white' className="mb-4" />
-              Processing KYC, please wait...
-            </div>
-              : isSocureProcess ? <div id='socure' /> : <SignUp
-                {...checkoutInfo}
-                onNext={() => {
-                  setIsSocureProcess(true)
-                }}
-              />}
-          </>
-        }
-        {values.auth === 'login' && !user && <Login
-          {...checkoutInfo}
-          onNext={() => onNext(currentStep + 1)}
-        />}
         <CardDetails
           checkoutRequest={checkoutRequest?.checkoutRequest}
           {...checkoutInfo}
@@ -489,9 +476,9 @@ export function Checkout() {
       <div className="flex mt-8 mb-8">
         <div onClick={() => currentStep > 0 && onNext(0)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 0 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
         <div onClick={() => currentStep > 1 && onNext(1)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        <div onClick={() => currentStep > 2 && onNext(2)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
-        {!user && <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 3 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>}
-        <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${(!user ? currentStep === 4 : currentStep === 3) ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
+        {/* <div onClick={() => currentStep > 2 && onNext(2)} className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div> */}
+        {!user && <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${currentStep === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>}
+        <div className={`w-4 h-4 ml-2 mr-2 rounded-full cursor-pointer ${(!user ? currentStep === 3 : currentStep === 2) ? 'bg-gradient-to-b from-purple-400 to-purple-600' : 'bg-white'}`}></div>
       </div>
       {(checkoutLoading || loadingCreateAccount) && (
         <div className="absolute w-full h-full bg-white/10 flex flex-col items-center justify-center top-0">
