@@ -20,7 +20,7 @@ export const CREATE_CHECKOUT = gql`
       streetAddress2
       city
       state
-      zip
+      postalCode
       country
       createdAt
       updatedAt
@@ -48,7 +48,7 @@ export const CREATE_CHECKOUT_WITHOUT_USER = gql`
       streetAddress2
       city
       state
-      zip
+      postalCode
       country
       createdAt
       updatedAt
@@ -66,16 +66,17 @@ export const CREATE_ACCOUNT = gql`
       phoneNumber
       gender
       dob
-      taxId
+      ssn
       streetAddress
       streetAddress2
       city
       state
-      zip
+      postalCode
       country
       isVerified
       createdAt
       updatedAt
+      token
     }
   }
 `;
@@ -100,7 +101,7 @@ export const GET_CHECKOUT = gql`
       streetAddress2
       city
       state
-      zip
+      postalCode
       country
       createdAt
       updatedAt
@@ -145,7 +146,7 @@ export const GET_CHECKOUT_REQUEST = gql`
         streetAddress2
         city
         state
-        zip
+        postalCode
         country
         createdAt
         updatedAt
@@ -173,12 +174,12 @@ export const GET_ME = gql`
       phoneNumber
       gender
       dob
-      taxId
+      ssn
       streetAddress
       streetAddress2
       city
       state
-      zip
+      postalCode
       country
       isVerified
       createdAt
@@ -211,8 +212,20 @@ subscription UserVerify($userId: String!) {
   }
 }`
 
-export const GET_PRIME_TRUST_AGREEMENT_PREVIEW = gql`
-  query agreementPreview($name: String!) {
-    agreementPreview(name: $name)
+export const GET_AGREEMENT_LINK = gql`
+  query agreementLink {
+    agreementLink
   }
 `
+
+export const GET_KYC_LINK = gql`
+  query kycLink {
+    kycLink
+  }
+`
+
+export const KYC_COMPLETED = gql`
+  mutation keyCompleted {
+    keyCompleted
+  }
+`;

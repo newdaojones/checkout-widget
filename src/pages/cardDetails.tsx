@@ -34,7 +34,6 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   const onGenerateTokenFailed = (e: any) => {
-    console.log(e)
     Frames.init(checkoutConfig)
     setFieldValue('isValidCard', false)
     setFieldValue('token', '')
@@ -47,7 +46,9 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   useEffect(() => {
+    console.log(values.isValidCard, values.token, isLoading)
     if (values.isValidCard && values.token && isLoading) {
+      console.log('========')
       submitForm()
       setIsLoading(false)
     }
@@ -60,7 +61,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     !errors.email &&
     !errors.country &&
     !errors.phoneNumber &&
-    !errors.zip &&
+    !errors.postalCode &&
     !errors.state &&
     !errors.city &&
     !errors.streetAddress &&
@@ -189,10 +190,10 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
           </div>
           <div className="flex-1">
             <input
-              value={values.zip}
-              onBlur={() => setFieldTouched('zip', true)}
-              onChange={(e) => setFieldValue('zip', e.target.value)}
-              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Zip" />
+              value={values.postalCode}
+              onBlur={() => setFieldTouched('postalCode', true)}
+              onChange={(e) => setFieldValue('postalCode', e.target.value)}
+              className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="Postal Code" />
           </div>
         </div>
         <div className="flex">
@@ -200,7 +201,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
             {touched.country && errors.country && <div className='text-red-400 text-[12px] text-left'>{errors.country}</div>}
           </div>
           <div className="flex-1">
-            {touched.zip && errors.zip && <div className='text-red-400 text-[12px] text-left'>{errors.zip}</div>}
+            {touched.postalCode && errors.postalCode && <div className='text-red-400 text-[12px] text-left'>{errors.postalCode}</div>}
           </div>
         </div>
         <div

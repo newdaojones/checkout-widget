@@ -1,15 +1,15 @@
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { GET_PRIME_TRUST_AGREEMENT_PREVIEW } from "../utils/graphql";
 import FadeLoader from 'react-spinners/FadeLoader';
 import { toast } from "react-toastify";
+import { GET_AGREEMENT_LINK } from "../utils/graphql";
 
 export const PrimeTrustTerms = () => {
   const [params] = useSearchParams()
   const name = useMemo(() => params.get('name'), [params])
 
-  const { data, error, loading } = useQuery(GET_PRIME_TRUST_AGREEMENT_PREVIEW, {
+  const { data, error, loading } = useQuery(GET_AGREEMENT_LINK, {
     variables: {
       name
     },
