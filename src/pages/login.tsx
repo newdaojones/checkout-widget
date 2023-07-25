@@ -23,7 +23,8 @@ export const Login = ({
         : 0,
     [values]
   );
-  const isRequiredLogin = useMemo(() => totalAmount >= 500, [totalAmount]);
+  // const isRequiredLogin = useMemo(() => totalAmount >= 500, [totalAmount]);
+  const isRequiredLogin = false
 
   const isValid = useMemo(
     () => !errors.userEmail && !errors.password && values.userEmail && values.password,

@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 import UsFlagImage from '../assets/images/us-flag.png';
 import VisaIcon from '../assets/images/visa-icon.png';
 import { CheckoutInfo } from "../types/checkout.type";
+
+const explorerUri = process.env.REACT_APP_EXPLORER_URL || 'https://mumbai.polygonscan.com'
+
 export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
   transaction?: any,
   checkoutInfo: CheckoutInfo,
@@ -51,7 +54,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           <p className="text-white text-lg text-left">Transaction Status</p>
           <div className="flex w-full">
             <CopyToClipboard
-              text={transaction?.transactionId ? `https://mumbai.polygonscan.com/tx/${transaction?.transactionId}` : ''}
+              text={transaction?.transactionId ? `${explorerUri}/tx/${transaction?.transactionId}` : ''}
               onCopy={() => {
                 if (transaction?.transactionId) {
                   toast.success('Copied transaction')
