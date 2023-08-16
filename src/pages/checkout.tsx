@@ -50,7 +50,7 @@ export function Checkout() {
     },
     skip: !storedCheckoutId || !!checkoutRequestId
   })
-  const { data: kycLinkRes } = useQuery(GET_KYC_LINK, {
+  const { data: kycLinkRes, loading: isGettingKYCLink } = useQuery(GET_KYC_LINK, {
     skip: !isKycProcessing
   })
 
@@ -440,7 +440,7 @@ export function Checkout() {
       {(checkoutLoading || loadingCreateAccount || isKycProcessing) && (
         <div className="absolute w-full h-full bg-white/10 flex flex-col items-center justify-center top-0">
           <FadeLoader color="white" />
-          <div className='mt-2 text-white'>{loadingCreateAccount ? 'Creating account...' : isKycProcessing ? 'Processing KYC...' : 'Sending request...'}</div>
+          <div className='mt-2 text-white'>{loadingCreateAccount ? 'Creating account...' : isGettingKYCLink ? 'Generating KYC link...' : isKycProcessing ? 'Processing KYC...' : 'Sending request...'}</div>
         </div>
       )}
     </div>
