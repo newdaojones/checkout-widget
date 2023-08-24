@@ -213,8 +213,8 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               onChange={(e) => setFieldValue('state', e.target.value)}
               className="bg-transparent placeholder-white text-lg outline-none w-full" placeholder="State"
             >
-              <option value="">State</option>
-              {stateList.map((state) => <option key={state.value} value={state.value}>{state.value}</option>)}
+              <option className='text-black' value="">State</option>
+              {stateList.map((state) => <option className='text-black' key={state.value} value={state.value}>{state.value}</option>)}
             </select>
           </div>
           <div className="flex-1">
