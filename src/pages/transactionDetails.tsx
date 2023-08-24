@@ -65,7 +65,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
               </div>
             </CopyToClipboard>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
-              ETH TX ID
+              TX ID
             </div>
           </div>
         </div>
