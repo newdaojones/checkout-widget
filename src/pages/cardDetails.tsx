@@ -13,7 +13,7 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const CardDetails = ({ setFieldTouched, values, errors, touched, setFieldValue, setFieldError, submitForm, checkoutRequest }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isVisaCard, setIsVisaCard] = useState(true);
+  const [isAcceptableCard, setIsAcceptableCard] = useState(true);
 
   const onCardValidationChanged = (e: any) => {
     setFieldTouched('isValidCard', true, false)
@@ -21,7 +21,8 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   const onPaymentMethodChanged = (e: any) => {
-    setIsVisaCard(e.paymentMethod === 'Visa')
+    console.log(e.paymentMethod)
+    setIsAcceptableCard(e.paymentMethod === 'Visa' || e.paymentMethod === 'Mastercard')
   }
 
   const ref = useRef<any>()
@@ -46,9 +47,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
   }
 
   useEffect(() => {
-    console.log(values.isValidCard, values.token, isLoading)
     if (values.isValidCard && values.token && isLoading) {
-      console.log('========')
       submitForm()
       setIsLoading(false)
     }
@@ -66,8 +65,8 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
     !errors.city &&
     !errors.streetAddress &&
     !errors.streetAddress2 &&
-    isVisaCard &&
-    !errors.isValidCard, [errors, values, isVisaCard])
+    isAcceptableCard &&
+    !errors.isValidCard, [errors, values, isAcceptableCard])
 
   const onSubmit = () => {
     if (!isValid || isLoading) {
@@ -178,7 +177,7 @@ export const CardDetails = ({ setFieldTouched, values, errors, touched, setField
               onChange={(e) => setFieldValue('cvv', e)} />
           </div>
         </Frames>
-        {!isVisaCard ? <div className='text-red-400 text-[12px] text-left'>We accept Visa debit/credit</div> : touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
+        {!isAcceptableCard ? <div className='text-red-400 text-[12px] text-left'>We accept Visa/Mastercard debit/credit</div> : touched.isValidCard && errors.isValidCard && <div className='text-red-400 text-[12px] text-left'>{errors.isValidCard}</div>}
         <div className="mt-5 text-white text-lg outline-none bg-white/20 pl-2 pr-2 w-full h-7 shadow-sm border-l-2 border-b-2 border-white rounded-sm flex">
           <div className="flex-1">
             <input
