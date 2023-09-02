@@ -142,7 +142,9 @@ export function Checkout() {
       auth: 'login',
       userEmail: '',
       userPhoneNumber: '',
-      signedAgreementId: ''
+      signedAgreementId: '',
+      cardBin: '',
+      cardBrand: '',
     },
     validateOnBlur: true,
     validateOnChange: true,
@@ -168,6 +170,8 @@ export function Checkout() {
       toast.error(checkoutError.message)
       setFieldValue('isValidCard', false)
       setFieldValue('token', '')
+      setFieldValue('cardBrand', '')
+      setFieldValue('cardBin', '')
       onNext(0)
       resetCheckout()
     }

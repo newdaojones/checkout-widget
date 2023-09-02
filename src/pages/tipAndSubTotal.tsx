@@ -33,14 +33,23 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
     </div>
     {touched.cost && errors.cost && <div className='text-red-400 text-[12px] text-left'>{errors.cost}</div>}
     <div>
-      <p className="text-white text-lg mt-4 text-left">+ Tip (optional)</p>
+      <p className="text-white text-lg mt-4 text-right">(dab up your driver)</p>
       <div className='mt-3 flex w-full justify-end items-center'>
-        <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.1).toFixed(2) : ''}</p>
+        <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.03).toFixed(2) : ''}</p>
         <div
-          className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '10' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '10' ? '' : '10')}
+          className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '03' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '03' ? '' : '03')}
         >
-          10%
+          03%
+        </div>
+      </div>
+      <div className='mt-3 flex w-full justify-end items-center'>
+        <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.08).toFixed(2) : ''}</p>
+        <div
+          className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '08' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '08' ? '' : '08')}
+        >
+          08%
         </div>
       </div>
       <div className='mt-3 flex w-full justify-end items-center'>
@@ -53,19 +62,10 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         </div>
       </div>
       <div className='mt-3 flex w-full justify-end items-center'>
-        <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * 0.2).toFixed(2) : ''}</p>
-        <div
-          className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === '20' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === '20' ? '' : '20')}
-        >
-          20%
-        </div>
-      </div>
-      <div className='mt-3 flex w-full justify-end items-center'>
-        <p className='text-white text-lg m-0 mr-5'> {values.cost && values.tipPercent && ![10, 15, 20].includes(Number(values.tipPercent)) ? (Number(values.cost) * Number(values.tipPercent) / 100).toFixed(2) : ''}</p>
+        <p className='text-white text-lg m-0 mr-5'> {values.cost && values.tipPercent && ![3, 8, 15].includes(Number(values.tipPercent)) ? (Number(values.cost) * Number(values.tipPercent) / 100).toFixed(2) : ''}</p>
         {focusedCustomTip ?
           <input
-            value={[10, 15, 20].includes(Number(values.tipPercent)) ? undefined : values.tipPercent}
+            value={[3, 8, 15].includes(Number(values.tipPercent)) ? undefined : values.tipPercent}
             placeholder=""
             autoFocus
             onBlur={() => setFocusedCustomTip(false)}
@@ -73,10 +73,10 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
             className={`h-11 bg-white/50 text-center outline-none text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white placeholder-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
           />
           : <div
-            className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+            className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent && !['03', '08', '15'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
             onClick={() => setFocusedCustomTip(true)}
           >
-            {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '__%'}
+            {values.tipPercent && !['03', '08', '15'].includes(values.tipPercent) ? `${values.tipPercent}%` : '__%'}
           </div>
         }
       </div>
