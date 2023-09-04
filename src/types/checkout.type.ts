@@ -24,4 +24,6 @@ export interface CheckoutInfo {
     userEmail: string
     userPhoneNumber: string
     signedAgreementId: string
+    cardBin: string
+    cardBrand: string
 }

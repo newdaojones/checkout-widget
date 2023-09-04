@@ -1,5 +1,8 @@
 import * as yup from 'yup';
 
+const blacklistedBins = ['409758', '435880', '438857', '440393', '444607', '485953', '512230', '515676', '518725', '534636', '552433', '558341'];
+const acceptableBrands = ['Visa', 'Mastercard'];
+
 export const checkoutValidationSchema = yup.object().shape({
   walletAddress: yup.string().required('Wallet Address is required'),
   firstName: yup.string().required('First Name is required'),
@@ -19,5 +22,16 @@ export const checkoutValidationSchema = yup.object().shape({
   cost: yup.number().required('The cost is required').positive().min(1, 'The cost must be greater than $1'),
   tipPercent: yup.number().positive('The tip amount must be positive'),
   feeMethod: yup.number().positive('Payment fee method is required'),
-  isConfirmedPurchase: yup.boolean().isTrue('Please confirm for purchasing')
+  isConfirmedPurchase: yup.boolean().isTrue('Please confirm for purchasing'),
+  cardBrand: yup.string().test('check-bin', 'We accept Visa/Mastercard debit/credit', function (value) {
+    if (!value) {
+      return true
+    }
+
+    return acceptableBrands.includes(value)
+  }),
+  cardBin: yup.string().test('check-bin', 'The issuer of this card is not supported', function (value) {
+    const bin = value?.substring(0, 6) || '';
+    return !blacklistedBins.includes(bin);
+  })
 })
