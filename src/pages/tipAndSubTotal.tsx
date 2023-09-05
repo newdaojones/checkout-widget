@@ -76,21 +76,24 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
         </div>
       </div>
       <div className='mt-3 flex w-full justify-end items-center'>
-        <p className='text-white text-lg m-0 mr-5'> {values.tipType === 'cash' ? tipAmount : ''}</p>
+        <p className='text-white text-lg m-0 mr-5'> {values.tipType === 'cash' ? (tipAmount || '') : ''}</p>
         {focusedCustomTip ?
-          <input
-            value={values.tipType === 'percent' ? undefined : values.tipAmount}
-            placeholder=""
-            autoFocus
-            onBlur={() => setFocusedCustomTip(false)}
-            onChange={(e) => onChangeTip(e.target.value, 'cash')}
-            className={`h-11 bg-white/50 text-center outline-none text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white placeholder-white ${values.tipType === 'cash' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-          />
+          <div className={`h-11 bg-white/50 text-center flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white placeholder-white ${values.tipType === 'cash' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}>
+            <p className="text-white">$</p>
+            <input
+              value={values.tipType === 'percent' ? undefined : values.tipAmount}
+              placeholder=""
+              autoFocus
+              className="outline-none text-white bg-transparent w-12"
+              onBlur={() => setFocusedCustomTip(false)}
+              onChange={(e) => onChangeTip(e.target.value, 'cash')}
+            />
+          </div>
           : <div
             className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipType === 'cash' ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
             onClick={() => setFocusedCustomTip(true)}
           >
-            {values.tipType === 'cash' ? `${values.tipAmount}` : '__'}
+            {values.tipType === 'cash' ? `$${values.tipAmount}` : '$__'}
           </div>
         }
       </div>
