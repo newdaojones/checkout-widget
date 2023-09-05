@@ -124,7 +124,7 @@ export function Checkout() {
     initialValues: {
       cost: '',
       tipPercent: '',
-      feeMethod: 0,
+      feeMethod: 1,
       firstName: '',
       lastName: '',
       email: '',
