@@ -1,9 +1,9 @@
 import { FormikProps } from "formik";
 import { useMemo } from "react";
 import UsFlagImage from '../assets/images/us-flag.png';
-import UsdcIcon from '../assets/images/usdc-icon.png';
 import { useAuth } from "../context/auth";
 import { CheckoutInfo } from "../types/checkout.type";
+import { calcTip } from "../utils";
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
@@ -11,7 +11,8 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
   const { user } = useAuth();
-  const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
+  const tipAmount = useMemo(() => calcTip(values), [values]);
+  const costWithTip = useMemo(() => Number(values.cost || 0) + tipAmount, [values, tipAmount]);
   const fee = useMemo(() => Number((costWithTip * 0.06).toFixed(2)), [costWithTip])
   const total = useMemo(() => costWithTip + fee, [costWithTip, fee])
 
