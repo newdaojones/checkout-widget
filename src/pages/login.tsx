@@ -19,7 +19,7 @@ export const Login = ({
     () =>
       values.cost
         ? Number(values.cost) +
-        (Number(values.cost) * Number(values.tipPercent || 0)) / 100
+        (Number(values.cost) * Number(values.tipAmount || 0)) / 100
         : 0,
     [values]
   );

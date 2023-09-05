@@ -1,7 +1,7 @@
 import { FormikProps } from "formik";
-import { useMemo, useState } from "react";
-import UsFlagImage from '../assets/images/us-flag.png';
+import React, { useMemo, useState } from "react";
 import { CheckoutInfo } from "./src/types/checkout.type";
+import UsFlagImage from '../assets/images/us-flag.png';
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
@@ -10,7 +10,7 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched, setFieldTouched, checkoutRequestId }: Props) => {
   const [focusedCustomTip, setFocusedCustomTip] = useState(false)
-  const isValid = useMemo(() => values.cost && !errors.cost && !errors.tipPercent, [errors, values])
+  const isValid = useMemo(() => values.cost && !errors.cost && !errors.tipAmount, [errors, values])
 
   return <div className='widget-container'>
     <h3 className="text-white text-4xl mb-10 text-center">Tip & Sub Total</h3>
@@ -35,42 +35,42 @@ export const TipAndSubTotal = ({ values, onNext, setFieldValue, errors, touched,
     <div>
       <p className="text-white text-lg mt-4 text-left">+ Tip (optional)</p>
       <div className='mt-3 flex w-full justify-between items-center flex-wrap'>
-        {["10", "15", "20"].map((tipPercent) => (
-          <div key={tipPercent} className='flex w-1/4 justify-end items-center'>
-            <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * Number(tipPercent) / 100).toFixed(2) : ''}</p>
+        {["10", "15", "20"].map((tipAmount) => (
+          <div key={tipAmount} className='flex w-1/4 justify-end items-center'>
+            <p className='text-white text-lg m-0 mr-5'> {values.cost ? (Number(values.cost) * Number(tipAmount) / 100).toFixed(2) : ''}</p>
             <div
-              className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent === tipPercent ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
-              onClick={() => setFieldValue && setFieldValue('tipPercent', values.tipPercent === tipPercent ? '' : tipPercent)}
+              className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipAmount === tipAmount ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+              onClick={() => setFieldValue && setFieldValue('tipAmount', values.tipAmount === tipAmount ? '' : tipAmount)}
             >
-              {tipPercent}%
+              {tipAmount}%
             </div>
           </div>
         ))}
         <div className='mt-3 flex w-1/4 justify-end items-center'>
-          <p className='text-white text-lg m-0 mr-5'> {values.cost && values.tipPercent && ![10, 15, 20].includes(Number(values.tipPercent)) ? (Number(values.cost) * Number(values.tipPercent) / 100).toFixed(2) : ''}</p>
+          <p className='text-white text-lg m-0 mr-5'> {values.cost && values.tipAmount && ![10, 15, 20].includes(Number(values.tipAmount)) ? (Number(values.cost) * Number(values.tipAmount) / 100).toFixed(2) : ''}</p>
           {focusedCustomTip ?
             <input
-              value={[10, 15, 20].includes(Number(values.tipPercent)) ? undefined : values.tipPercent}
+              value={[10, 15, 20].includes(Number(values.tipAmount)) ? undefined : values.tipAmount}
               placeholder=""
               autoFocus
               onBlur={() => setFocusedCustomTip(false)}
-              onChange={(e) => setFieldValue && setFieldValue('tipPercent', e.target.value)}
-              className={`h-11 bg-white/50 text-center outline-none text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white placeholder-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+              onChange={(e) => setFieldValue && setFieldValue('tipAmount', e.target.value)}
+              className={`h-11 bg-white/50 text-center outline-none text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white placeholder-white ${values.tipAmount && !['10', '15', '20'].includes(values.tipAmount) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
             />
             : <div
-              className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
+              className={`h-11 bg-white/50 text-white flex items-center justify-center w-24 rounded-md cursor-pointer shadow-md shadow-white ${values.tipAmount && !['10', '15', '20'].includes(values.tipAmount) ? 'bg-gradient-to-b from-purple-200 to-purple-400' : ''}`}
               onClick={() => setFocusedCustomTip(true)}
             >
-              {values.tipPercent && !['10', '15', '20'].includes(values.tipPercent) ? `${values.tipPercent}%` : '__%'}
+              {values.tipAmount && !['10', '15', '20'].includes(values.tipAmount) ? `${values.tipAmount}%` : '__%'}
             </div>
           }
         </div>
-        {touched.tipPercent && errors.tipPercent && <div className='text-red-400 text-[12px] text-right mt-1'>{errors.tipPercent}</div>}
+        {touched.tipAmount && errors.tipAmount && <div className='text-red-400 text-[12px] text-right mt-1'>{errors.tipAmount}</div>}
       </div>
       <p className="mt-2 text-white text-lg text-left">= Sub-Total</p>
       <div className="flex w-full">
         <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-          {values.cost ? (Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100).toFixed(2) : ''}
+          {values.cost ? (Number(values.cost) + Number(values.cost) * Number(values.tipAmount || 0) / 100).toFixed(2) : ''}
         </div>
         <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
           <img src={UsFlagImage} alt='' className="flag mr-2" />

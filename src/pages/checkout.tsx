@@ -79,8 +79,8 @@ export function Checkout() {
             email: data.email,
             phoneNumber: data.phoneNumber,
             amount: Number(data.cost),
-            tip: data.tipPercent ? Number(data.tipPercent) : 0,
-            tipType: 'percent',
+            tip: data.tipAmount ? Number(data.tipAmount) : 0,
+            tipType: data.tipType,
             feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
@@ -103,8 +103,8 @@ export function Checkout() {
             email: data.email,
             phoneNumber: data.phoneNumber,
             amount: Number(data.cost),
-            tip: data.tipPercent ? Number(data.tipPercent) : 0,
-            tipType: 'percent',
+            tip: data.tipAmount ? Number(data.tipAmount) : 0,
+            tipType: data.tipType,
             feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
@@ -123,8 +123,9 @@ export function Checkout() {
   const checkoutInfo = useFormik<CheckoutInfo>({
     initialValues: {
       cost: '',
-      tipPercent: '',
-      feeMethod: 0,
+      tipAmount: '',
+      tipType: 'percent',
+      feeMethod: 1,
       firstName: '',
       lastName: '',
       email: '',
@@ -250,7 +251,8 @@ export function Checkout() {
       setFieldValue('postalCode', checkoutData?.checkout.postalCode || '', false)
       setFieldValue('country', checkoutData?.checkout.country || 'USA', false)
       setFieldValue('cost', checkoutData?.checkout.amount, false)
-      setFieldValue('tipPercent', checkoutData?.checkout.tip, false)
+      setFieldValue('tipAmount', checkoutData?.checkout.tip, false)
+      setFieldValue('tipType', checkoutData?.checkout.tipType || 'percent', false)
     }
   }, [checkoutData, setFieldValue])
 

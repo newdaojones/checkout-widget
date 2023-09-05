@@ -1,12 +1,13 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ClockLoader from 'react-spinners/ClockLoader';
 import { toast } from "react-toastify";
 import UsFlagImage from '../assets/images/us-flag.png';
 import VisaIcon from '../assets/images/visa-icon.png';
 import { CheckoutInfo } from "../types/checkout.type";
+import { calcTip } from '../utils';
 
 const explorerUri = process.env.REACT_APP_EXPLORER_URL || 'https://mumbai.polygonscan.com'
 
@@ -16,6 +17,8 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
   onNext: () => void
 }) => {
   const [confirmed, setConfirmed] = useState(false)
+  const tipAmount = useMemo(() => calcTip(checkoutInfo), [checkoutInfo]);
+  const subTotal = useMemo(() => (Number(checkoutInfo.cost || 0) + tipAmount).toFixed(2), [checkoutInfo, tipAmount])
 
   useEffect(() => {
     if (transaction?.paidStatus === 'paid' || transaction?.paidStatus === 'error') {
@@ -31,7 +34,7 @@ export const TransactionDetails = ({ checkoutInfo, transaction, onNext }: {
           <p className="text-white text-lg text-left">Amount</p>
           <div className="flex w-full">
             <div className="border-white border-2 rounded-md h-11 bg-transparent flex-1 text-white text-md text-right text-lg p-2 shadow-sm shadow-white">
-              {checkoutInfo.cost ? (Number(checkoutInfo.cost) + Number(checkoutInfo.cost) * Number(checkoutInfo.tipPercent || 0) / 100).toFixed(2) : ''}
+              {subTotal}
             </div>
             <div className='border-2 border-white rounded-md h-11 w-24 ml-1 flex items-center justify-center text-white text-lg shadow-sm shadow-white'>
               <img src={UsFlagImage} alt='' className="flag mr-2" />

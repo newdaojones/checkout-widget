@@ -20,8 +20,8 @@ export const checkoutValidationSchema = yup.object().shape({
   streetAddress2: yup.string().optional(),
   isValidCard: yup.boolean().isTrue('The card info is invalid'),
   cost: yup.number().required('The cost is required').positive().min(1, 'The cost must be greater than $1'),
-  tipPercent: yup.number().positive('The tip amount must be positive'),
-  feeMethod: yup.number().positive('Payment fee method is required'),
+  tipAmount: yup.number().positive('The tip amount must be positive'),
+  tipType: yup.string(),
   isConfirmedPurchase: yup.boolean().isTrue('Please confirm for purchasing'),
   cardBrand: yup.string().test('check-bin', 'We accept Visa/Mastercard debit/credit', function (value) {
     if (!value) {

@@ -1,9 +1,9 @@
 import { FormikProps } from "formik";
 import { useMemo } from "react";
 import UsFlagImage from '../assets/images/us-flag.png';
-import UsdcIcon from '../assets/images/usdc-icon.png';
 import { useAuth } from "../context/auth";
 import { CheckoutInfo } from "../types/checkout.type";
+import { calcTip } from "../utils";
 
 interface Props extends FormikProps<CheckoutInfo> {
   onNext: () => void
@@ -11,12 +11,12 @@ interface Props extends FormikProps<CheckoutInfo> {
 
 export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext }: Props) => {
   const { user } = useAuth();
-  const costWithTip = useMemo(() => values.cost ? Number(values.cost) + Number(values.cost) * Number(values.tipPercent || 0) / 100 : 0, [values]);
+  const tipAmount = useMemo(() => calcTip(values), [values]);
+  const costWithTip = useMemo(() => Number(values.cost || 0) + tipAmount, [values, tipAmount]);
   const fee = useMemo(() => Number((costWithTip * 0.06).toFixed(2)), [costWithTip])
   const total = useMemo(() => costWithTip + fee, [costWithTip, fee])
 
   const isValid = useMemo(() =>
-    !errors.feeMethod &&
     !errors.isConfirmedPurchase,
     [errors])
 
@@ -62,23 +62,6 @@ export const MethodAndTotal = ({ touched, errors, values, setFieldValue, onNext 
         </label>
         {touched.isConfirmedPurchase && errors.isConfirmedPurchase && <div className='text-red-400 text-[12px] text-left'>{errors.isConfirmedPurchase}</div>}
       </div>
-      <div hidden> // hidden until we have USDC payment method defined
-        <button
-          disabled
-          className={`h-11 bg-white/50 text-white flex items-center justify-center w-20 rounded-md cursor-pointer shadow-md shadow-white ${values.feeMethod === 2 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-          onClick={() => setFieldValue('feeMethod', 2)}
-        >
-          <img src={UsdcIcon} alt='' className="!w-6" />
-        </button>
-        <div className="text-sm text-center text-white mt-1">{fee.toFixed(2)}</div>
-      </div>
-      <button
-        onClick={() => setFieldValue('feeMethod', 1)}
-        className={`mt-4 text-white text-lg text-center w-full rounded-md h-11 border-2 border-white flex items-center justify-center shadow-md shadow-white ${values.feeMethod === 1 ? 'bg-gradient-to-b from-purple-400 to-purple-600' : ''}`}
-      >
-        <div className="flex items-center">Credit or Debit</div>
-      </button>
-      {touched.feeMethod && errors.feeMethod && <div className='text-red-400 text-[12px] text-left mt-3 ml-6'>{errors.feeMethod}</div>}
       <button
         disabled={!isValid}
         onClick={() => onNext()}
