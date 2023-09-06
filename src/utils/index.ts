@@ -10,7 +10,6 @@ export const calcTip = (checkoutInfo: CheckoutInfo) => {
   }
 
   return checkoutInfo.cost
-    ? Number(checkoutInfo.cost) +
-        (Number(checkoutInfo.cost) * Number(checkoutInfo.tipAmount || 0)) / 100
+    ? (Number(checkoutInfo.cost) * Number(checkoutInfo.tipAmount || 0)) / 100
     : 0;
 };
