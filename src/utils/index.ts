@@ -13,3 +13,17 @@ export const calcTip = (checkoutInfo: CheckoutInfo) => {
     ? (Number(checkoutInfo.cost) * Number(checkoutInfo.tipAmount || 0)) / 100
     : 0;
 };
+
+export const calcFee = (checkoutInfo: CheckoutInfo) => {
+  if (!checkoutInfo.fee) {
+    return 0;
+  }
+
+  if (checkoutInfo.feeType === "cash") {
+    return Number(checkoutInfo.fee);
+  }
+
+  return checkoutInfo.cost
+    ? (Number(checkoutInfo.cost) * Number(checkoutInfo.fee || 0)) / 100
+    : 0;
+};

@@ -20,6 +20,17 @@ import { TransactionDetails } from './transactionDetails';
 import { useAgreement } from '../context/agreement';
 import { KycProcess } from './kycProcess';
 
+const config: {
+  fee: number
+  feeType: 'percent' | 'cash'
+  feeMethod: number
+  tipType: 'percent' | 'cash'
+} = {
+  fee: 6.5,
+  feeType: 'percent',
+  feeMethod: 1,
+  tipType: 'percent'
+}
 
 export function Checkout() {
   const refreshUserRef = useRef<any>()
@@ -81,6 +92,8 @@ export function Checkout() {
             amount: Number(data.cost),
             tip: data.tipAmount ? Number(data.tipAmount) : 0,
             tipType: data.tipType,
+            fee: data.fee,
+            feeType: data.feeType,
             feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
@@ -105,6 +118,8 @@ export function Checkout() {
             amount: Number(data.cost),
             tip: data.tipAmount ? Number(data.tipAmount) : 0,
             tipType: data.tipType,
+            fee: data.fee,
+            feeType: data.feeType,
             feeMethod: data.feeMethod,
             streetAddress: data.streetAddress,
             streetAddress2: data.streetAddress2 || undefined,
@@ -124,8 +139,10 @@ export function Checkout() {
     initialValues: {
       cost: '',
       tipAmount: '',
-      tipType: 'percent',
-      feeMethod: 1,
+      tipType: config.tipType,
+      fee: config.fee,
+      feeType: config.feeType,
+      feeMethod: config.feeMethod,
       firstName: '',
       lastName: '',
       email: '',
@@ -211,6 +228,9 @@ export function Checkout() {
       setFieldValue('walletAddress', checkoutRequest.checkoutRequest.walletAddress, false)
       setFieldValue('phoneNumber', checkoutRequest.checkoutRequest.phoneNumber, false)
       setFieldValue('email', checkoutRequest.checkoutRequest.email, false)
+      setFieldValue('fee', checkoutRequest.checkoutRequest?.fee || config.fee, false)
+      setFieldValue('feeType', checkoutRequest.checkoutRequest?.feeType || config.feeType, false)
+      setFieldValue('feeMethod', checkoutRequest.checkoutRequest?.feeMethod || config.feeMethod, false)
     }
   }, [checkoutRequest, setFieldValue])
 
@@ -252,7 +272,10 @@ export function Checkout() {
       setFieldValue('country', checkoutData?.checkout.country || 'USA', false)
       setFieldValue('cost', checkoutData?.checkout.amount, false)
       setFieldValue('tipAmount', checkoutData?.checkout.tip, false)
-      setFieldValue('tipType', checkoutData?.checkout.tipType || 'percent', false)
+      setFieldValue('tipType', checkoutData?.checkout.tipType || config.tipType, false)
+      setFieldValue('fee', checkoutData?.checkout?.fee || config.fee, false)
+      setFieldValue('feeType', checkoutData?.checkout?.feeType || config.feeType, false)
+      setFieldValue('feeMethod', checkoutData?.checkout?.feeMethod || config.feeMethod, false)
     }
   }, [checkoutData, setFieldValue])
 
