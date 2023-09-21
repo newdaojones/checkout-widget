@@ -2,6 +2,8 @@ export interface CheckoutInfo {
   cost: string;
   tipType: "percent" | "cash";
   tipAmount: string;
+  fee: number;
+  feeType: "percent" | "cash";
   feeMethod: number;
   firstName: string;
   lastName: string;

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const CREATE_CHECKOUT = gql`
   mutation CreateCheckout($data: CheckoutInputType!) {
@@ -116,7 +116,7 @@ export const GET_CHECKOUT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_CHECKOUT_REQUEST = gql`
   query CheckoutRequest($id: String!) {
@@ -128,6 +128,9 @@ export const GET_CHECKOUT_REQUEST = gql`
       phoneNumber
       amount
       status
+      fee
+      feeType
+      feeMethod
       checkout {
         id
         walletAddress
@@ -162,7 +165,7 @@ export const GET_CHECKOUT_REQUEST = gql`
       }
     }
   }
-`
+`;
 
 export const GET_ME = gql`
   query Me {
@@ -186,7 +189,7 @@ export const GET_ME = gql`
       updatedAt
     }
   }
-`
+`;
 
 export const TRANSACTION_SUBSCRIPTION = gql`
   subscription Transaction($checkoutId: String!) {
@@ -203,26 +206,27 @@ export const TRANSACTION_SUBSCRIPTION = gql`
 `;
 
 export const ACCOUNT_VERIFY = gql`
-subscription UserVerify($userId: String!) {
-  userVerify(userId: $userId) {
-    userId
-    status
-    error
-    token
+  subscription UserVerify($userId: String!) {
+    userVerify(userId: $userId) {
+      userId
+      status
+      error
+      token
+    }
   }
-}`
+`;
 
 export const GET_AGREEMENT_LINK = gql`
   query agreementLink {
     agreementLink
   }
-`
+`;
 
 export const GET_KYC_LINK = gql`
   query kycLink {
     kycLink
   }
-`
+`;
 
 export const KYC_COMPLETED = gql`
   mutation keyCompleted {
