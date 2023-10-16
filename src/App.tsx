@@ -30,7 +30,7 @@ function App() {
               <Route path='/kyc-success' element={<KycSuccess />} />
               <Route path='/kyb-success/:partnerId' element={<KybSuccess />} />
               <Route path='/agreement-accept' element={<AgreementAccept />} />
-              <Route path='/coinfella/*' element={<CoinFella />} />
+              <Route path='/coinfella/:checkoutRequestId/*' element={<CoinFella />} />
               <Route path='/*' element={<Main />} />
             </Routes>
           </CheckoutProvider>

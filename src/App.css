@@ -145,3 +145,17 @@ input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
 p.BasicParagraph, li.BasicParagraph, div.BasicParagraph, .pt__signature {
   color: white !important;
 }
+
+.coinfella .PhoneInputInput {
+  width: 100%;
+}
+
+.coinfella .PhoneInputInput::placeholder {
+  color: #d1d5db;
+} 
+
+.coinfella .flag {
+  width: 24px !important;
+  height: 24px !important;
+  margin-right: 0.5rem !important;
+}
