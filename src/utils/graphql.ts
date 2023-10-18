@@ -73,6 +73,7 @@ export const CREATE_ACCOUNT = gql`
       state
       postalCode
       country
+      status
       isVerified
       createdAt
       updatedAt
@@ -184,6 +185,32 @@ export const GET_ME = gql`
       state
       postalCode
       country
+      status
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query User($userId: String!) {
+    user(userId: $userId) {
+      id
+      firstName
+      lastName
+      email
+      phoneNumber
+      gender
+      dob
+      ssn
+      streetAddress
+      streetAddress2
+      city
+      state
+      status
+      postalCode
+      country
       isVerified
       createdAt
       updatedAt
@@ -228,8 +255,20 @@ export const GET_KYC_LINK = gql`
   }
 `;
 
+export const GET_USER_KYC_LINK = gql`
+  query userKycLink($userId: String!) {
+    kycLink: userKycLink(userId: $userId)
+  }
+`;
+
 export const KYC_COMPLETED = gql`
-  mutation keyCompleted {
-    keyCompleted
+  mutation kycCompleted {
+    kycCompleted
+  }
+`;
+
+export const USER_KYC_COMPLETED = gql`
+  mutation userKycCompleted($userId: String!) {
+    userKycCompleted(userId: $userId)
   }
 `;
