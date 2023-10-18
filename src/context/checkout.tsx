@@ -452,11 +452,11 @@ export const CheckoutProvider = (props: {
     if (isWindowFocused) {
       if (checkoutRequestId) {
         refreshCheckoutRequest()
-      } else {
+      } else if (storedCheckoutId) {
         refetchCheckout()
       }
     }
-  }, [isWindowFocused])
+  }, [isWindowFocused, storedCheckoutId])
 
   const isLoading = useMemo(() => isProcessingKyc || isCreatingAccount || isCheckingOut || isGettingKycLink, [isProcessingKyc, isCreatingAccount, isCheckingOut, isGettingKycLink])
   const loadingMessage = useMemo(() => {
