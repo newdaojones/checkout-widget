@@ -264,6 +264,7 @@ export const CheckoutProvider = (props: {
           data: createAccountResponse.createUser
         }), "*");
       }
+      setUser(createAccountResponse?.createUser)
       refreshUser()
     }
   }, [createAccountResponse])
