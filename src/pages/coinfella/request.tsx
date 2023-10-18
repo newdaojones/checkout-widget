@@ -17,6 +17,8 @@ export const CoinFellaRequest = () => {
     setRequestId(checkoutRequestId)
   }, [checkoutRequestId, setRequestId])
 
+  console.log(checkout)
+
   return <Routes>
     <Route path="/info" element={checkout ? <Navigate to={"../transaction"} replace /> : <CoinFellaInformation />} />
     <Route path="/payment" element={checkout ? <Navigate to={"../transaction"} replace /> : <CoinFellaPayment />} />
