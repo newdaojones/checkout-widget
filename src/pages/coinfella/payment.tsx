@@ -43,7 +43,6 @@ export const CoinFellaPayment = () => {
   }
 
   const onPaymentMethodChanged = (e: any) => {
-    console.log(e.paymentMethod)
     setFieldTouched('cardBrand', true, false)
     setFieldValue('cardBrand', e.paymentMethod)
   }
@@ -56,7 +55,6 @@ export const CoinFellaPayment = () => {
   }
 
   const onGenerate = (e: any) => {
-    console.log(e)
     setFieldValue('token', e.token);
   }
 

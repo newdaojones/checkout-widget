@@ -16,7 +16,6 @@ export const KycProcess = ({
         <div className="text-center text-white mb-5">
           {user.status === 'rejected' ? 'Failed KYC, please try again' : 'Required KYC process for trading assets'}
         </div>
-
       </div>
       <button
         onClick={() => onNext()}

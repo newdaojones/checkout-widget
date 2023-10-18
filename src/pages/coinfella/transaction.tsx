@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import { toast } from "react-toastify";
@@ -12,10 +12,22 @@ import VisaIcon from '../../assets/images/visa-icon.png';
 const explorerUri = process.env.REACT_APP_EXPLORER_URL || 'https://mumbai.polygonscan.com'
 
 export const CoinFellaTransaction = () => {
-  const { checkoutInfo, transaction } = useCheckout()
+  const { checkoutInfo, transaction, checkoutRequest } = useCheckout()
   const { values } = checkoutInfo
   const tipAmount = useMemo(() => calcTip(values), [values]);
   const subTotal = useMemo(() => (Number(values.cost || 0) + tipAmount).toFixed(2), [values, tipAmount])
+
+  useEffect(() => {
+    if (checkoutRequest?.checkoutRequest && transaction)
+      window.parent.postMessage(JSON.stringify({
+        type: 'order',
+        action: 'update',
+        data: {
+          id: checkoutRequest.checkoutRequest?.id,
+          status: transaction.paidStatus
+        }
+      }), "*");
+  }, [checkoutRequest, transaction])
 
   return <div className="pt-3">
     <h3 className="text-white text-xl">Transaction</h3>

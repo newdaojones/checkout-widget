@@ -22,6 +22,8 @@ import {
   GET_CHECKOUT,
   GET_CHECKOUT_REQUEST,
   GET_KYC_LINK,
+  GET_USER,
+  GET_USER_KYC_LINK,
   TRANSACTION_SUBSCRIPTION
 } from '../utils/graphql';
 import { CheckoutInfo } from '../types/checkout.type';
@@ -52,6 +54,7 @@ interface CheckoutContextProps {
   onCreateAccount: () => void;
   onProcessKyc: () => void;
   setRequestId: (value: string | undefined) => void;
+  onSetUser: (value: any) => void;
 }
 
 const CheckoutContext = createContext<CheckoutContextProps>({
@@ -60,7 +63,8 @@ const CheckoutContext = createContext<CheckoutContextProps>({
   isProcessingKyc: false,
   onCreateAccount: () => { },
   onProcessKyc: () => { },
-  setRequestId: (value: string | undefined) => { }
+  setRequestId: (value: string | undefined) => { },
+  onSetUser: (value: any) => { }
 });
 
 export const useCheckout = () => {
@@ -73,7 +77,7 @@ export const CheckoutProvider = (props: {
   children: React.ReactNode
 }) => {
   const refreshUserRef = useRef<any>()
-  const { user, refreshUser } = useAuth()
+  const { user: authUser, refreshUser } = useAuth()
   const [checkoutRequestId, setCheckoutRequestId] = useState<string>()
   let [searchParams, setSearchParams] = useSearchParams();
 
@@ -81,7 +85,15 @@ export const CheckoutProvider = (props: {
   const [checkout, setCheckout] = useState<any>()
   const [transaction, setTransaction] = useState<any>();
   const [isProcessingKyc, setIsKycProcessing] = useState(false)
+  const [user, setUser] = useState<any>();
   const { isWindowFocused } = useWindowFocus()
+  const { data: userRes, refetch: getUser } = useQuery(GET_USER, {
+    variables: {
+      userId: user?.id
+    },
+    skip: !user?.id
+  })
+
   const { data: checkoutRequest, error: checkoutRequestError, refetch: refreshCheckoutRequest } = useQuery(GET_CHECKOUT_REQUEST, {
     variables: {
       id: checkoutRequestId
@@ -97,8 +109,11 @@ export const CheckoutProvider = (props: {
     },
     skip: !storedCheckoutId || !!checkoutRequestId
   })
-  const { data: kycLinkRes, loading: isGettingKycLink } = useQuery(GET_KYC_LINK, {
-    skip: !isProcessingKyc
+  const { data: kycLinkRes, loading: isGettingKycLink, error: kycError } = useQuery(authUser ? GET_KYC_LINK : GET_USER_KYC_LINK, {
+    skip: !isProcessingKyc,
+    variables: {
+      userId: user?.id
+    }
   })
 
   const kycLink = useMemo(() => kycLinkRes?.kycLink, [kycLinkRes])
@@ -117,8 +132,12 @@ export const CheckoutProvider = (props: {
     setCheckoutRequestId(value)
   }, [])
 
+  const onSetUser = useCallback((value: string) => {
+    setUser(value)
+  }, [])
+
   const onSubmitForm = (data: CheckoutInfo) => {
-    if (user) {
+    if (authUser) {
       createCheckout({
         variables: {
           data: {
@@ -167,6 +186,7 @@ export const CheckoutProvider = (props: {
             country: data.country || undefined,
             walletAddress: data.walletAddress,
             checkoutRequestId,
+            userId: user?.id
           }
         }
       })
@@ -221,6 +241,12 @@ export const CheckoutProvider = (props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkoutError, setFieldValue])
 
+  useEffect(() => {
+    if (kycError) {
+      toast.error(kycError.message)
+      setIsKycProcessing(false)
+    }
+  }, [kycError])
 
   useEffect(() => {
     if (transaction?.paidStatus === 'error') {
@@ -229,8 +255,15 @@ export const CheckoutProvider = (props: {
   }, [transaction])
 
   useEffect(() => {
-    if (createAccountResponse?.createUser?.token) {
+    if (createAccountResponse?.createUser) {
       localStorage.setItem('auth_token', createAccountResponse?.createUser?.token)
+      if (window.parent) {
+        window.parent.postMessage(JSON.stringify({
+          type: 'account',
+          action: 'create',
+          data: createAccountResponse.createUser
+        }), "*");
+      }
       refreshUser()
     }
   }, [createAccountResponse])
@@ -332,6 +365,14 @@ export const CheckoutProvider = (props: {
     setIsKycProcessing(true)
   }, [])
 
+  const onRefreshUser = () => {
+    if (authUser) {
+      refreshUser()
+    } else if (user) {
+      getUser()
+    }
+  }
+
   // KYC PROCESS Start
   useEffect(() => {
     if (refreshUserRef.current) {
@@ -339,7 +380,7 @@ export const CheckoutProvider = (props: {
     }
 
     if (isProcessingKyc) {
-      refreshUserRef.current = setInterval(() => refreshUser(), 5000)
+      refreshUserRef.current = setInterval(() => onRefreshUser(), 5000)
     }
   }, [isProcessingKyc])
 
@@ -354,6 +395,16 @@ export const CheckoutProvider = (props: {
       setIsKycProcessing(false)
     }
   }, [user])
+
+  useEffect(() => {
+    setUser(authUser)
+  }, [authUser])
+
+  useEffect(() => {
+    if (userRes?.user) {
+      setUser(userRes.user)
+    }
+  }, [userRes])
 
   // KYC PROCESS End
 
@@ -428,7 +479,8 @@ export const CheckoutProvider = (props: {
     isProcessingKyc,
     onCreateAccount,
     onProcessKyc,
-    setRequestId
+    setRequestId,
+    onSetUser,
   }), [
     user,
     checkoutRequestId,
@@ -440,6 +492,7 @@ export const CheckoutProvider = (props: {
     isProcessingKyc,
     loadingMessage,
     checkoutRequest,
+    onSetUser,
     onCreateAccount,
     onProcessKyc,
     setRequestId

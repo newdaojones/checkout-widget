@@ -1,9 +1,16 @@
 import { useMutation } from "@apollo/client";
-import React, { useEffect } from "react";
-import { KYC_COMPLETED } from "../utils/graphql";
+import React, { useEffect, useMemo } from "react";
+import { KYC_COMPLETED, USER_KYC_COMPLETED } from "../utils/graphql";
+import { useSearchParams } from "react-router-dom";
 
 export const KycSuccess = () => {
-  const [createKycCompleted] = useMutation(KYC_COMPLETED);
+  const [params] = useSearchParams()
+  const userId = useMemo(() => params.get('userId'), [params])
+  const [createKycCompleted] = useMutation(userId ? USER_KYC_COMPLETED : KYC_COMPLETED, {
+    variables: {
+      userId
+    }
+  });
 
 
   useEffect(() => {

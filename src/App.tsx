@@ -4,13 +4,12 @@ import './App.css';
 import "react-multi-carousel/lib/styles.css";
 import 'react-toastify/dist/ReactToastify.css';
 import "react-datepicker/dist/react-datepicker.css";
-import { Checkout } from './pages/checkout';
+
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './services';
 import { ToastContainer } from 'react-toastify';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from './context/auth';
-import { Header } from './components/header';
 import { PrimeTrustTerms } from './pages/primeTrustTerms';
 import { KycSuccess } from './pages/kycSucess';
 import { AgreementAccept } from './pages/agreementAccept';
@@ -30,7 +29,7 @@ function App() {
               <Route path='/kyc-success' element={<KycSuccess />} />
               <Route path='/kyb-success/:partnerId' element={<KybSuccess />} />
               <Route path='/agreement-accept' element={<AgreementAccept />} />
-              <Route path='/coinfella/:checkoutRequestId/*' element={<CoinFella />} />
+              <Route path='/coinfella/*' element={<CoinFella />} />
               <Route path='/*' element={<Main />} />
             </Routes>
           </CheckoutProvider>

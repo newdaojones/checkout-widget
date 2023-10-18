@@ -83,8 +83,6 @@ export const CoinFellaInformation = () => {
               placeholder="(123) 456-7890"
               autoComplete="off"
               className="placeholder-gray-300"
-              // name={checkoutRequest?.phoneNumber ? 'phoneNumber_off' : 'phoneNumber'}
-              // disabled={!!checkoutRequest?.phoneNumber}
               onBlur={() => setFieldTouched('phoneNumber', true)}
               value={values.phoneNumber}
               onChange={(e) => setFieldValue('phoneNumber', e)}
