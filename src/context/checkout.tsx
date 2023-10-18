@@ -410,7 +410,7 @@ export const CheckoutProvider = (props: {
   // KYC PROCESS End
 
   useEffect(() => {
-    if (checkout) {
+    if (checkout?.id !== storedCheckoutId) {
       setSearchParams({
         id: checkout.id
       })

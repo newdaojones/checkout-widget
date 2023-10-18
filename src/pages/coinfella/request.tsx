@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCheckout } from "../../context/checkout";
 import { CoinFellaInformation } from "./info";
 import { CoinFellaPayment } from "./payment";
@@ -12,18 +12,18 @@ export const CoinFellaRequest = () => {
   } = useCheckout()
   const navigate = useNavigate()
   const { checkoutRequestId } = useParams();
-
+  const location = useLocation();
   useEffect(() => {
     setRequestId(checkoutRequestId)
   }, [checkoutRequestId, setRequestId])
 
   useEffect(() => {
-    if (checkout) {
+    if (checkout && !location?.pathname?.includes('/transaction')) {
       setTimeout(() => {
         navigate('./transaction')
       }, 500)
     }
-  }, [checkout, navigate])
+  }, [checkout, navigate, location])
 
   return <Routes>
     <Route path="/info" element={<CoinFellaInformation />} />

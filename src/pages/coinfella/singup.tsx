@@ -196,7 +196,7 @@ export const CoinFellaSignup = () => {
             onBlur={() => setFieldTouched('city', true)}
             onChange={(e) => setFieldValue('city', e.target.value)}
             className="outline-none border-2 border-gray-300 rounded-md h-11 w-full flex items-center justify-center text-white text-lg shadow-sm bg-transparent p-2 placeholder-gray-300"
-            placeholder="New York"
+            placeholder="San Francisco"
           />
           {touched.city && errors.city && <div className='text-red-400 text-[12px] text-left'>{errors.city}</div>}
         </div>
