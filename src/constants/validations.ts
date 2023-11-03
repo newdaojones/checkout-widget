@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-const blacklistedBins = ['409758', '435880', '438857', '440393', '444607', '485953', '512230', '515676', '518725', '534636', '552433', '558341'];
+const blacklistedBins = ['409758', '435880', '438857', '440393', '444607', '485953', '512230', '515676', '518725', '534636', '552433', '558341', '517805', '542418', '532839'];
 const acceptableBrands = ['Visa', 'Mastercard'];
 
 export const checkoutValidationSchema = yup.object().shape({
