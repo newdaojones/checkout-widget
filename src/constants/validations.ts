@@ -15,7 +15,10 @@ const blacklistedBins = [
   "558341",
   "517805",
   "540324",
+  "542418",
+  "532839",
 ];
+
 const acceptableBrands = ["Visa", "Mastercard"];
 
 export const checkoutValidationSchema = yup.object().shape({
