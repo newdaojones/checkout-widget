@@ -410,7 +410,7 @@ export const CheckoutProvider = (props: {
   // KYC PROCESS End
 
   useEffect(() => {
-    if (checkout) {
+    if (checkout && checkout?.id !== storedCheckoutId) {
       setSearchParams({
         id: checkout.id
       })
@@ -418,15 +418,21 @@ export const CheckoutProvider = (props: {
   }, [checkout])
 
   useEffect(() => {
-    setCheckout(checkoutResponse?.createCheckout)
+    if (checkoutResponse?.createCheckout) {
+      setCheckout(checkoutResponse?.createCheckout)
+    }
   }, [checkoutResponse])
 
   useEffect(() => {
-    setCheckout(checkoutWithoutUserRes?.createCheckoutWithoutUser)
+    if (checkoutWithoutUserRes?.createCheckoutWithoutUser) {
+      setCheckout(checkoutWithoutUserRes?.createCheckoutWithoutUser)
+    }
   }, [checkoutWithoutUserRes])
 
   useEffect(() => {
-    setCheckout(checkoutData?.checkout)
+    if (checkoutData?.checkout) {
+      setCheckout(checkoutData?.checkout)
+    }
   }, [checkoutData])
 
   useEffect(() => {
@@ -452,7 +458,7 @@ export const CheckoutProvider = (props: {
     if (isWindowFocused) {
       if (checkoutRequestId) {
         refreshCheckoutRequest()
-      } else if (storedCheckoutId) {
+      } else {
         refetchCheckout()
       }
     }
